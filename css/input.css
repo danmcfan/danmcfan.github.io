@@ -5,7 +5,3 @@ html, body {
     color: white;
     font-family: "Roboto Mono", monospace;
 }
-
-[x-cloak] {
-    display: none !important;
-}
