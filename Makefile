@@ -6,3 +6,5 @@ live/tailwind:
 
 serve:
 	python3 -m http.server
+
+.PHONY: tailwind live/tailwind serve
