@@ -8,15 +8,27 @@
       content="A personal website featuring Danny O'Brien's projects."
     />
     <title>Danny O'Brien</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="shortcut icon" href="/img/favicon.svg" />
     <link rel="stylesheet" href="/css/output.css" />
     <script src="/js/alpine.min.js"></script>
   </head>
   <body>
-    <main class="flex flex-col items-center h-dvh gap-8 p-8 md:p-16">
-      <h1 class="text-4xl md:text-6xl font-bold">Danny O'Brien</h1>
+    <main
+      class="flex flex-col items-center h-dvh gap-4 md:gap-8 p-8 md:p-16 bg-linear-to-b from-green-700 to-green-900"
+    >
+      <h1
+        class="text-4xl md:text-6xl font-bold text-shadow-[3px_3px_0px_rgba(0,0,0,1)] md:text-shadow-[4px_4px_0px_rgba(0,0,0,1)] select-none"
+      >
+        Danny O'Brien
+      </h1>
       <ul
-        class="flex flex-col items-center w-full md:w-2xl gap-4"
+        class="flex flex-col items-center w-full md:w-2xl md:gap-6 gap-4"
         x-data="{
                 links: [
                     {
@@ -54,13 +66,13 @@
               target="_blank"
             >
               <img
-                class="absolute left-4 size-10 md:size-12"
+                class="absolute left-4 size-10 md:size-12 select-none"
                 :src="link.src"
                 :alt="link.alt"
               />
               <span
                 x-text="link.name"
-                class="flex-1 ml-4 text-center font-bold text-xl md:text-2xl"
+                class="flex-1 ml-4 text-center font-bold text-xl md:text-2xl select-none"
               ></span>
             </a>
             <div
