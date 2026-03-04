@@ -22,8 +22,8 @@ export function SocialLinks(props: SocialLinksProps) {
         {(social) => (
           <li>
             <a
-              aria-label={social.name}
-              title={social.name}
+              aria-label={social.kind}
+              title={social.kind}
               class={socialIconButtonClass}
               href={social.href}
               target="_blank"
