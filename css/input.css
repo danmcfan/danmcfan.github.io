@@ -1,7 +1,0 @@
-@import "tailwindcss";
-
-html, body {
-    overscroll-behavior: none;
-    color: white;
-    font-family: "Roboto Mono", monospace;
-}

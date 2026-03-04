@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: "Roboto Mono", monospace;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
