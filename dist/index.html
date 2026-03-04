@@ -5,12 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Danny O'Brien</title>
     <link rel="icon" type="image/svg+xml" href="/assets/favicon-VrhCq_yc.svg" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
-      rel="stylesheet"
-    />
-    <script type="module" crossorigin src="/assets/index-QJZ6cZ0u.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BQvea0bE.css">
+    <script>
+      (function (location) {
+        if (!location.search.startsWith("?/")) {
+          return;
+        }
+
+        const decodedPath = location.search
+          .slice(2)
+          .split("&")
+          .map((segment) => segment.replace(/~and~/g, "&"))
+          .join("?");
+
+        const nextUrl = `${location.pathname}${decodedPath}${location.hash}`;
+        window.history.replaceState(null, "", nextUrl);
+      })(window.location);
+    </script>
+    <script type="module" crossorigin src="/assets/index-F7L4rM47.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-B27AUpAZ.css">
   </head>
   <body id="root">
   </body>
