@@ -3,8 +3,10 @@ import { For } from "solid-js";
 
 import { navButtonClass } from "../ui/buttonStyles";
 
+const showAdventureLog = false;
+
 const links = [
-  { href: "/", label: "Adventure Log" },
+  { href: "/", label: "Adventure Log", hidden: !showAdventureLog },
   { href: "/projects", label: "Quests" },
   { href: "/about", label: "Character Sheet" },
 ];
@@ -20,7 +22,7 @@ export function NavBar() {
   return (
     <nav aria-label="Main" class="w-full">
       <ul class="flex flex-wrap items-center gap-3">
-        <For each={links}>
+        <For each={links.filter((link) => !link.hidden)}>
           {(link) => (
             <li>
               <A
