@@ -6,7 +6,7 @@ import { navButtonClass } from "../ui/buttonStyles";
 const showAdventureLog = false;
 
 const links = [
-  { href: "/", label: "Adventure Log", hidden: !showAdventureLog },
+  { href: "/blog", label: "Adventure Log", hidden: !showAdventureLog },
   { href: "/projects", label: "Quests" },
   { href: "/about", label: "Character Sheet" },
 ];
@@ -17,7 +17,7 @@ export function NavBar() {
   const isActive = (href: string) =>
     href === "/"
       ? location.pathname === "/"
-      : location.pathname.startsWith(href);
+      : location.pathname === href || location.pathname.startsWith(`${href}/`);
 
   return (
     <nav aria-label="Main" class="w-full">
