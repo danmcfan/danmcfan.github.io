@@ -6,6 +6,6 @@ export const sharedButtonSurfaceClass =
 
 export const navButtonClass = `inline-flex rounded-md px-3 py-1.5 text-sm font-semibold ${sharedButtonSurfaceClass} ${sharedButtonHoverClass}`;
 
-export const projectCardButtonClass = `group block rounded-lg p-6 ${sharedButtonSurfaceClass} ${sharedButtonHoverClass}`;
+export const projectCardButtonClass = `group flex flex-col rounded-lg p-6 ${sharedButtonSurfaceClass} ${sharedButtonHoverClass}`;
 
 export const socialIconButtonClass = `inline-flex size-14 items-center justify-center rounded-md ${sharedButtonSurfaceClass} ${sharedButtonHoverClass}`;

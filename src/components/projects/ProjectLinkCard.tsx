@@ -31,7 +31,7 @@ export function ProjectLinkCard(props: ProjectLinkCardProps) {
       </span>
       <p class="font-serif text-2xl text-emerald-50">{props.project.name}</p>
       <p class="mt-2 text-sm text-emerald-100">{props.project.description}</p>
-      <ul class="mt-3 flex flex-wrap gap-1.5">
+      <ul class="mt-auto flex flex-wrap gap-1.5 pt-4">
         <For each={props.project.tags}>
           {(tag) => (
             <li class="rounded-full border border-emerald-400/40 bg-emerald-950/60 px-2 py-0.5 text-xs text-emerald-200">
