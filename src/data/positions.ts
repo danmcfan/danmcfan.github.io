@@ -115,9 +115,6 @@ export const education = {
   landmark: "camp" as Landmark,
 };
 
-/** Infrastructure counts as equipment rather than skills on the sheet. */
-export const equipment = ["Docker", "Kubernetes", "AWS", "GCP", "Azure", "Neo4j", "SQL Server"];
-
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export function formatMonth(value: string) {

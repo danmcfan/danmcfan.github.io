@@ -17,7 +17,7 @@ type InkRuleProps = { class?: string };
 export function InkRule(props: InkRuleProps) {
   return (
     <svg
-      class={cn("block h-3 w-full text-dragon/70", props.class)}
+      class={cn("block h-3 w-full stroke-dragon/70", props.class)}
       viewBox="0 0 320 12"
       preserveAspectRatio="none"
       aria-hidden="true"
@@ -25,7 +25,6 @@ export function InkRule(props: InkRuleProps) {
       <path
         d="M2 7 C 60 2, 120 11, 180 6 S 290 3, 318 7"
         fill="none"
-        stroke="currentColor"
         stroke-width="2"
         stroke-linecap="round"
         vector-effect="non-scaling-stroke"

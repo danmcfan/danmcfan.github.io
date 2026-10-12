@@ -39,10 +39,11 @@ export function SheetBox(props: SheetBoxProps) {
       class={cn(cardVariants({ variant: "sheet" }), "gap-3 p-4 pb-5", local.class)}
       {...rest}
     >
-      {local.children}
-      <h3 class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-parchment px-2 font-mono text-[0.62rem] tracking-[0.14em] whitespace-nowrap uppercase">
+      {/* First in the DOM so it heads the box's content; drawn on the bottom edge. */}
+      <h3 class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-parchment px-2 font-mono text-[0.7rem] tracking-[0.12em] whitespace-nowrap uppercase">
         {local.label}
       </h3>
+      {local.children}
     </section>
   );
 }

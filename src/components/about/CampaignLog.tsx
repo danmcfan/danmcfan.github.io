@@ -58,7 +58,7 @@ type MapLayout = {
   scenery: { kind: SceneryKind; x: number; y: number; scale: number }[];
 };
 
-/** Work history beside a hand-drawn map whose trail follows the reader down the page. */
+/** Work history beside a hand-drawn map whose trail is inked in as the reader scrolls. */
 export function CampaignLog() {
   let wrapper!: HTMLDivElement;
   let mapColumn!: HTMLDivElement;
@@ -67,7 +67,6 @@ export function CampaignLog() {
 
   const [map, setMap] = createSignal<MapLayout>();
   const [travelled, setTravelled] = createSignal(0);
-  const [token, setToken] = createSignal<Point>({ x: 0, y: 0 });
   const [active, setActive] = createSignal(-1);
 
   // Trail length sampled against height, so a scroll position maps to a point on the path.
@@ -81,7 +80,8 @@ export function CampaignLog() {
     const wide = width >= 120;
     const points = items.map((item, i) => ({
       x: width * (i % 2 === 0 ? 0.36 : 0.64),
-      y: item.offsetTop + 18,
+      // Level with the middle of the entry's title.
+      y: item.offsetTop + 15,
     }));
 
     const route: Point[] = [{ x: width * 0.5, y: 0 }];
@@ -141,8 +141,6 @@ export function CampaignLog() {
     const length = a.length + (b.length - a.length) * t;
 
     setTravelled(length);
-    const point = trail.getPointAtLength(length);
-    setToken({ x: point.x, y: point.y });
 
     let reached = -1;
     layout.stops.forEach((stop, index) => {
@@ -190,10 +188,10 @@ export function CampaignLog() {
   };
 
   return (
-    <section aria-labelledby="campaign-log" class="grid gap-6">
-      <h3 id="campaign-log" class="font-display text-3xl text-dragon">
-        Campaign Log
-      </h3>
+    <section aria-labelledby="experience" class="grid gap-6">
+      <h2 id="experience" class="font-display text-3xl text-dragon">
+        Experience
+      </h2>
 
       <div ref={wrapper} class="relative grid grid-cols-[4.25rem_minmax(0,1fr)] gap-x-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-x-8">
         <div ref={mapColumn} class="relative" aria-hidden="true">
@@ -219,7 +217,7 @@ export function CampaignLog() {
                   <Show when={layout().width >= 120}>
                     <g transform={`translate(${layout().width * 0.12} 2)`}>
                       <path d={compassPath} />
-                      <text y="-19" text-anchor="middle" class="fill-ink-soft stroke-none font-display text-[11px]">
+                      <text y="-19" text-anchor="middle" class="fill-ink-soft stroke-none font-display text-[12px]">
                         N
                       </text>
                     </g>
@@ -270,7 +268,7 @@ export function CampaignLog() {
                           class="fill-card stroke-[1.8] transition-colors duration-300"
                           classList={{
                             "stroke-dragon": i <= active(),
-                            "stroke-ink-soft/70": i > active(),
+                            "stroke-ink-soft": i > active(),
                           }}
                           stroke-linejoin="round"
                           stroke-linecap="round"
@@ -290,11 +288,6 @@ export function CampaignLog() {
                     );
                   }}
                 </Index>
-
-                <g transform={`translate(${token().x} ${token().y})`} class={travelled() > 0 ? "" : "opacity-0"}>
-                  <circle r="9" class="fill-dragon stroke-ink" stroke-width="1.5" />
-                  <path d="M0 -5.5 L5 3.5 H-5 Z" class="fill-none stroke-parchment" stroke-width="1.3" stroke-linejoin="round" />
-                </g>
               </svg>
             )}
           </Show>
@@ -308,18 +301,16 @@ export function CampaignLog() {
                 id={`campaign-${position.id}`}
                 class="grid gap-1 pb-10"
               >
-                <p class="font-mono text-[0.7rem] tracking-[0.12em] text-ink-soft uppercase">
-                  {formatMonth(position.start)} – {position.end ? formatMonth(position.end) : "Present"}
-                  <span class="text-ink-soft/70"> · {formatTenure(monthsBetween(position.start, position.end))}</span>
-                </p>
-                <h4
-                  class="font-display text-2xl leading-tight transition-colors duration-300 sm:text-3xl"
+                <h3
+                  class="text-xl leading-tight font-bold transition-colors duration-300 sm:text-2xl"
                   classList={{ "text-dragon": i() === active() }}
                 >
-                  {position.company}
-                </h4>
-                <p class="text-ink-soft italic">
-                  {position.title} · {position.location}
+                  {position.title}
+                </h3>
+                <p class="text-lg leading-snug">{position.company}</p>
+                <p class="text-sm text-ink-soft">
+                  {formatMonth(position.start)} – {position.end ? formatMonth(position.end) : "Present"} ·{" "}
+                  {formatTenure(monthsBetween(position.start, position.end))} · {position.location}
                 </p>
                 <Show when={position.highlights.length}>
                   <ul class="mt-2 grid max-w-[64ch] gap-1.5">
@@ -347,15 +338,15 @@ export function CampaignLog() {
             )}
           </For>
           <li ref={(el) => (items[positions.length] = el)} id={`campaign-${education.id}`} class="grid gap-1">
-            <p class="font-mono text-[0.7rem] tracking-[0.12em] text-ink-soft uppercase">{education.years}</p>
-            <h4
-              class="font-display text-2xl leading-tight transition-colors duration-300 sm:text-3xl"
+            <h3
+              class="text-xl leading-tight font-bold transition-colors duration-300 sm:text-2xl"
               classList={{ "text-dragon": active() === positions.length }}
             >
               {education.school}
-            </h4>
-            <p class="text-ink-soft italic">
-              {education.degree} · {education.location}
+            </h3>
+            <p class="text-lg leading-snug">{education.degree}</p>
+            <p class="text-sm text-ink-soft">
+              {education.years} · {education.location}
             </p>
           </li>
         </ol>
