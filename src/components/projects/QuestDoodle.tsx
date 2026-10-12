@@ -1,6 +1,7 @@
 import { type JSX } from "solid-js";
 
 import { type Project } from "../../data/projects";
+import { Doodle } from "../ui/doodle";
 
 const doodles: Record<Project["icon"], () => JSX.Element> = {
   // Arcade cabinet
@@ -46,24 +47,7 @@ type QuestDoodleProps = {
   class?: string;
 };
 
-/** Project icon drawn twice with a wobble filter, like a pencil sketch. */
+/** Project icon drawn as a pencil sketch. */
 export function QuestDoodle(props: QuestDoodleProps) {
-  return (
-    <svg
-      class={props.class}
-      viewBox="0 0 64 64"
-      fill="none"
-      stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <g filter="url(#sketch)">
-        <g stroke-width="2.4">{doodles[props.icon]()}</g>
-        <g stroke-width="1.2" opacity="0.45" transform="translate(1.1 0.8) rotate(1.5 32 32)">
-          {doodles[props.icon]()}
-        </g>
-      </g>
-    </svg>
-  );
+  return <Doodle draw={doodles[props.icon]} class={props.class} />;
 }

@@ -1,19 +1,20 @@
 import { For } from "solid-js";
 
+import { AboutCard } from "../components/about/AboutCard";
 import { CampaignLog } from "../components/about/CampaignLog";
 import { SocialLinks } from "../components/about/SocialLinks";
 import { Badge } from "../components/ui/badge";
-import { SheetBox } from "../components/ui/card";
-import { SheetField } from "../components/ui/sheet";
+import { cardVariants } from "../components/ui/card";
 import { careerStart, positions } from "../data/positions";
 import { socials } from "../data/socials";
+import { cn } from "../lib/cn";
 import { usePageTitle } from "../lib/usePageTitle";
 
 const YEAR = 365.25 * 24 * 60 * 60 * 1000;
 
 const skills = [
   {
-    group: "Cloud infrastructure",
+    group: "Cloud Infrastructure",
     items: [
       "AWS ECS Fargate",
       "AWS ALB",
@@ -25,26 +26,37 @@ const skills = [
       "Terraform",
       "Docker",
       "Kubernetes",
-      "GCP",
+      "Google Cloud Platform",
       "Azure",
     ],
   },
   {
-    group: "Backend",
-    items: ["Go", "Python (FastAPI, Django)", "gRPC", "WebSockets", "REST", "Microservices", "Distributed systems"],
+    group: "Backend Systems",
+    items: [
+      "Go",
+      "Python (FastAPI, Django)",
+      "gRPC",
+      "WebSockets",
+      "RESTful APIs",
+      "Microservices",
+      "Distributed Systems",
+    ],
   },
   {
-    group: "Data",
+    group: "Databases",
     items: ["DynamoDB", "ClickHouse", "Redis", "PostgreSQL", "MySQL", "MongoDB", "Kafka", "Neo4j", "SQLite"],
   },
-  { group: "Frontend", items: ["React", "Next.js", "TypeScript", "JavaScript", "Tailwind CSS", "HTML/CSS"] },
   {
-    group: "Machine learning",
-    items: ["PyTorch", "TensorFlow", "scikit-learn", "Pandas", "NumPy", "Model deployment"],
+    group: "Frontend Development",
+    items: ["React", "NextJS", "TypeScript", "JavaScript", "Tailwind CSS", "HTML/CSS"],
   },
   {
-    group: "DevOps & practice",
-    items: ["GitHub Actions CI/CD", "Git", "Agile/Scrum", "Test-driven development", "System design"],
+    group: "Machine Learning",
+    items: ["PyTorch", "TensorFlow", "Scikit-Learn", "Pandas", "NumPy", "Model Deployment"],
+  },
+  {
+    group: "DevOps & Tools",
+    items: ["CI/CD (GitHub Actions)", "Git", "Agile/Scrum", "Test-Driven Development (TDD)", "System Design"],
   },
 ];
 
@@ -85,20 +97,26 @@ export function AboutPage() {
       </header>
 
       <div class="grid gap-x-6 gap-y-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-        <SheetBox label="About" class="pb-6">
-          <dl class="grid flex-1 content-between gap-5">
-            <SheetField label="Currently">{current.company}</SheetField>
-            <SheetField label="Based in">San Diego, CA</SheetField>
-            <SheetField label="Experience">{years}+ years</SheetField>
-            <SheetField label="Education">B.S., UC Davis</SheetField>
-          </dl>
-        </SheetBox>
+        <section aria-labelledby="about" class="grid grid-rows-[auto_1fr] gap-6">
+          <h2 id="about" class="font-display text-3xl text-dragon">
+            About
+          </h2>
+          <ul class="grid auto-rows-fr gap-4">
+            <AboutCard icon="briefcase" label="Currently">{current.company}</AboutCard>
+            <AboutCard icon="pin" label="Based in">San Diego, CA</AboutCard>
+            <AboutCard icon="hourglass" label="Experience">{years}+ years</AboutCard>
+            <AboutCard icon="cap" label="Education">B.S., UC Davis</AboutCard>
+          </ul>
+        </section>
 
-        <SheetBox label="Skills" class="pb-6">
-          <dl class="grid gap-4">
+        <section aria-labelledby="skills" class="grid grid-rows-[auto_1fr] gap-6">
+          <h2 id="skills" class="font-display text-3xl text-dragon">
+            Skills
+          </h2>
+          <dl class={cn(cardVariants({ variant: "notice" }), "gap-4 bg-graph p-5")}>
             <For each={skills}>
               {(row) => (
-                <div class="grid gap-0.5">
+                <div class="grid gap-1.5">
                   <dt class="font-mono text-xs leading-5 tracking-[0.1em] text-ink-soft uppercase">{row.group}</dt>
                   <dd class="m-0">
                     <ul class="flex flex-wrap gap-1.5">
@@ -115,7 +133,7 @@ export function AboutPage() {
               )}
             </For>
           </dl>
-        </SheetBox>
+        </section>
       </div>
 
       <CampaignLog />
