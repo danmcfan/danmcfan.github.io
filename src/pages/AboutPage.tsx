@@ -67,7 +67,7 @@ export function AboutPage() {
   const current = positions[0];
 
   return (
-    <article class="grid gap-12">
+    <article class="grid gap-16 md:gap-20">
       <header class="grid gap-6 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-10">
         <div class="mx-auto grid w-40 content-start justify-items-center gap-3 md:w-full">
           <img
@@ -93,12 +93,12 @@ export function AboutPage() {
         </div>
       </header>
 
-      <div class="grid gap-x-6 gap-y-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+      <div class="grid gap-x-8 gap-y-14 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <section aria-labelledby="about" class="grid grid-rows-[auto_1fr] gap-6">
           <h2 id="about" class="font-display text-3xl text-dragon">
             About
           </h2>
-          <ul class="grid auto-rows-fr gap-4">
+          <ul class="grid auto-rows-fr gap-5">
             <AboutCard icon="briefcase" label="Currently">{current.company}</AboutCard>
             <AboutCard icon="pin" label="Based in">San Diego, CA</AboutCard>
             <AboutCard icon="hourglass" label="Experience">{years}+ years</AboutCard>
@@ -110,13 +110,13 @@ export function AboutPage() {
           <h2 id="skills" class="font-display text-3xl text-dragon">
             Skills
           </h2>
-          <dl class={cn(cardVariants({ variant: "notice" }), "gap-4 bg-graph p-5")}>
+          <dl class={cn(cardVariants({ variant: "notice" }), "gap-5 bg-graph p-6")}>
             <For each={skills}>
               {(row) => (
-                <div class="grid gap-1.5">
+                <div class="grid gap-2">
                   <dt class="font-mono text-xs leading-5 tracking-[0.1em] text-ink-soft uppercase">{row.group}</dt>
                   <dd class="m-0">
-                    <ul class="flex flex-wrap gap-1.5">
+                    <ul class="flex flex-wrap gap-2">
                       <For each={row.items}>
                         {(item) => (
                           <li>

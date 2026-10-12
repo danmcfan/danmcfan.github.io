@@ -57,13 +57,13 @@ export function CampaignLog() {
     const height = wrapper.offsetHeight;
     if (!width || !height) return;
     const wide = width >= 120;
-    const scale = wide ? 1 : 0.8;
+    const scale = wide ? 1.15 : 0.8;
     const left = width * 0.34;
     const right = width * 0.66;
     const points = items.map((item, i) => ({
       x: i % 2 === 0 ? left : right,
-      // Level with the middle of the entry's title.
-      y: item.offsetTop + 15,
+      // Level with the middle of the first line of the entry's title.
+      y: item.offsetTop + parseFloat(getComputedStyle(item.firstElementChild!).lineHeight) / 2,
     }));
 
     // The trail runs from just below each landmark to just above the next, so
@@ -109,12 +109,12 @@ export function CampaignLog() {
   });
 
   return (
-    <section aria-labelledby="experience" class="grid gap-6">
+    <section aria-labelledby="experience" class="grid gap-8">
       <h2 id="experience" class="font-display text-3xl text-dragon">
         Experience
       </h2>
 
-      <div ref={wrapper} class="relative grid grid-cols-[4.25rem_minmax(0,1fr)] gap-x-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-x-8">
+      <div ref={wrapper} class="relative grid grid-cols-[3.25rem_minmax(0,1fr)] gap-x-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-x-10">
         <div ref={mapColumn} class="relative" aria-hidden="true">
           <Show when={map()}>
             {(layout) => (
@@ -134,7 +134,7 @@ export function CampaignLog() {
                   <Show when={layout().width >= 120}>
                     <g transform={`translate(${layout().width * 0.8} ${layout().height - 18})`} stroke-width="1.5">
                       <path d={compassPath} />
-                      <text y="-19" text-anchor="middle" class="fill-ink-soft stroke-none font-display text-[12px]">
+                      <text y="-19" text-anchor="middle" class="fill-ink-soft stroke-none font-display text-[13px]">
                         N
                       </text>
                     </g>
@@ -145,7 +145,7 @@ export function CampaignLog() {
                   {(point, i) => {
                     const stop = stops[i];
                     const wide = () => layout().width >= 120;
-                    const scale = () => (wide() ? 1 : 0.8);
+                    const scale = () => (wide() ? 1.15 : 0.8);
                     const left = () => point().x < layout().width / 2;
                     return (
                       <g transform={`translate(${point().x} ${point().y})`}>
@@ -159,10 +159,10 @@ export function CampaignLog() {
                         />
                         <Show when={wide()}>
                           <text
-                            x={left() ? 22 : -22}
+                            x={left() ? 25 : -25}
                             y="4"
                             text-anchor={left() ? "start" : "end"}
-                            class="fill-ink-soft font-hand text-[17px]"
+                            class="fill-ink-soft font-hand text-[19px]"
                           >
                             {stop.label}
                           </text>
@@ -182,7 +182,7 @@ export function CampaignLog() {
               <li
                 ref={(el) => (items[i()] = el)}
                 id={`campaign-${position.id}`}
-                class="grid gap-1 pb-10"
+                class="grid gap-1.5 pb-16"
               >
                 <h3 class="text-xl leading-tight font-bold sm:text-2xl">
                   {position.title}
@@ -190,13 +190,13 @@ export function CampaignLog() {
                 <p class="text-lg leading-snug">{position.company}</p>
                 <EntryMeta start={position.start} end={position.end} location={position.location} tenure />
                 <Show when={position.highlights.length}>
-                  <ul class="mt-3 grid max-w-[64ch] gap-2">
+                  <ul class="mt-4 grid max-w-[64ch] gap-3">
                     <For each={position.highlights}>
                       {(highlight, k) => (
-                        <li class="relative pl-7 leading-snug">
+                        <li class="relative pl-8 leading-relaxed">
                           <Die
                             sides={dice[k() % dice.length]}
-                            class={`absolute top-[0.08em] left-0.5 size-[1.1em] text-dragon ${k() % 2 ? "rotate-6" : "-rotate-6"}`}
+                            class={`absolute top-[0.3em] left-0.5 size-[1.1em] text-dragon ${k() % 2 ? "rotate-6" : "-rotate-6"}`}
                           />
                           {highlight}
                         </li>
@@ -207,7 +207,7 @@ export function CampaignLog() {
               </li>
             )}
           </For>
-          <li ref={(el) => (items[positions.length] = el)} id={`campaign-${education.id}`} class="grid gap-1">
+          <li ref={(el) => (items[positions.length] = el)} id={`campaign-${education.id}`} class="grid gap-1.5">
             <h3 class="text-xl leading-tight font-bold sm:text-2xl">
               {education.school}
             </h3>

@@ -50,9 +50,9 @@ type AboutCardProps = {
 /** One fact about me, written on its own graph-paper card. */
 export function AboutCard(props: AboutCardProps) {
   return (
-    <li class={cn(cardVariants({ variant: "notice" }), "flex-row items-center gap-3 bg-graph px-4 py-4 lg:gap-4 lg:px-5")}>
+    <li class={cn(cardVariants({ variant: "notice" }), "flex-row items-center gap-3 bg-graph px-5 py-5 lg:gap-4 lg:px-6")}>
       <div class="grid min-w-0 flex-1 gap-0.5">
-        <p class="font-mono text-[0.7rem] tracking-[0.12em] text-ink-soft uppercase">{props.label}</p>
+        <p class="font-mono text-xs tracking-[0.12em] text-ink-soft uppercase">{props.label}</p>
         <p class="font-hand text-xl leading-tight whitespace-nowrap text-pencil sm:text-2xl md:text-xl lg:text-2xl">{props.children}</p>
       </div>
       <Doodle draw={doodles[props.icon]} class="size-9 shrink-0 text-ink lg:size-11" />

@@ -4,11 +4,11 @@ import { type JSX, splitProps } from "solid-js";
 import { cn } from "../../lib/cn";
 
 export const badgeVariants = cva(
-  "inline-flex items-center rounded-[2px] border font-mono text-[0.7rem] leading-none whitespace-nowrap",
+  "inline-flex items-center rounded-[2px] border font-mono text-[0.8rem] leading-none whitespace-nowrap",
   {
     variants: {
       variant: {
-        tag: "border-primary bg-primary px-1.5 py-1 text-card",
+        tag: "border-primary bg-primary px-2 py-1.5 text-card",
         seal: "border-2 border-current px-2 py-1 font-semibold tracking-widest uppercase -rotate-2",
       },
     },

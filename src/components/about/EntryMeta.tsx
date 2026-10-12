@@ -5,7 +5,7 @@ import { formatMonth } from "../../data/positions";
 function Glyph(props: { children: JSX.Element }) {
   return (
     <svg
-      class="size-4 shrink-0 overflow-visible"
+      class="size-[1.15em] shrink-0 overflow-visible"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -61,29 +61,31 @@ type EntryMetaProps = {
 /** When and where an entry happened, each marked with its own icon. */
 export function EntryMeta(props: EntryMetaProps) {
   return (
-    <dl class="mt-1 flex flex-wrap items-center gap-x-6 gap-y-1.5 font-mono text-xs tracking-[0.06em] text-ink-soft uppercase">
-      <div class="flex items-center gap-2">
-        <dt class="flex">
+    <dl class="mt-1.5 flex flex-wrap items-center gap-x-7 gap-y-1 font-mono text-sm tracking-[0.06em] text-ink-soft uppercase">
+      <div class="flex items-start gap-2">
+        <dt class="flex h-7 items-center">
           <Calendar />
           <span class="sr-only">Dates</span>
         </dt>
-        <dd class="m-0">
-          <time datetime={props.start}>{formatMonth(props.start)}</time>
-          {" – "}
-          {props.end ? <time datetime={props.end}>{formatMonth(props.end)}</time> : "Present"}
+        <dd class="m-0 flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <span class="leading-7 whitespace-nowrap">
+            <time datetime={props.start}>{formatMonth(props.start)}</time>
+            {" – "}
+            {props.end ? <time datetime={props.end}>{formatMonth(props.end)}</time> : "Present"}
+          </span>
           <Show when={props.tenure}>
-            <span class="ml-2 rounded-full border border-ink-soft/40 px-1.5 py-0.5 normal-case">
+            <span class="rounded-full border border-ink-soft/40 px-2 leading-6 whitespace-nowrap normal-case">
               {formatTenure(monthsBetween(props.start, props.end))}
             </span>
           </Show>
         </dd>
       </div>
-      <div class="flex items-center gap-2">
-        <dt class="flex">
+      <div class="flex items-start gap-2">
+        <dt class="flex h-7 items-center">
           <Pin />
           <span class="sr-only">Location</span>
         </dt>
-        <dd class="m-0">{props.location}</dd>
+        <dd class="m-0 leading-7">{props.location}</dd>
       </div>
     </dl>
   );

@@ -8,7 +8,7 @@ export function ProjectsPage() {
   usePageTitle("Quests");
 
   return (
-    <div class="grid gap-6 md:grid-cols-2">
+    <div class="grid gap-8 md:grid-cols-2">
       <For each={projects}>
         {(project) => <ProjectLinkCard project={project} />}
       </For>

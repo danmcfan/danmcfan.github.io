@@ -71,6 +71,11 @@
 @layer base {
   html {
     background: var(--color-parchment);
+    font-size: 106.25%;
+
+    @media (width >= 48rem) {
+      font-size: 112.5%;
+    }
   }
 
   body {

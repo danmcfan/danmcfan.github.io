@@ -16,7 +16,7 @@ export function ProjectLinkCard(props: ProjectLinkCardProps) {
     <a
       class={cn(
         cardVariants({ variant: "notice" }),
-        "group h-full gap-3 bg-graph p-5 no-underline",
+        "group h-full gap-4 bg-graph p-6 no-underline md:p-7",
         "motion-safe:transition-[translate,box-shadow] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(.2,.8,.2,1)]",
         "hover:shadow-[0_2px_0_rgb(46_34_25/0.06),0_22px_26px_-16px_rgb(40_25_10/0.55)] focus-visible:shadow-[0_2px_0_rgb(46_34_25/0.06),0_22px_26px_-16px_rgb(40_25_10/0.55)]",
         "motion-safe:hover:-translate-y-1.5 motion-safe:focus-visible:-translate-y-1.5",
@@ -39,7 +39,7 @@ export function ProjectLinkCard(props: ProjectLinkCardProps) {
       </div>
       <p class="leading-relaxed">{props.project.description}</p>
       <div class="mt-auto flex items-end gap-3 pt-2">
-        <ul class="flex min-w-0 flex-1 flex-wrap gap-1.5" aria-label="Built with">
+        <ul class="flex min-w-0 flex-1 flex-wrap gap-2" aria-label="Built with">
           <For each={props.project.tags}>
             {(tag) => (
               <li>

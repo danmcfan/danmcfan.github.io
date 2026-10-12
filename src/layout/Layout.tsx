@@ -55,15 +55,15 @@ export function Layout(props: LayoutProps) {
           </div>
         </header>
 
-        <InkRule class="mt-6 mb-10 w-full max-w-xs" />
+        <InkRule class="mt-8 mb-12 w-full max-w-xs" />
 
         <main ref={main} class="flex-1">
           {props.children}
         </main>
 
-        <footer class="mt-16 grid gap-3">
+        <footer class="mt-20 grid gap-4">
           <InkRule class="max-w-40" />
-          <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 text-sm text-ink-soft">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 text-base text-ink-soft">
             <p>© {new Date().getFullYear()} Danny O&apos;Brien</p>
             <ul class="flex gap-5">
               {socials.map((social) => (
