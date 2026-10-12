@@ -27,7 +27,9 @@ export function AboutPage() {
         <div class="mx-auto grid w-40 content-start justify-items-center gap-3 md:w-full">
           <img
             class="aspect-square w-full border-2 border-ink bg-card object-cover p-1.5 shadow-[0_8px_14px_-8px_rgb(40_25_10/0.55)]"
-            src="/headshot.jpeg"
+            src="/headshot-460.webp"
+            srcset="/headshot-176.webp 176w, /headshot-352.webp 352w, /headshot-460.webp 460w"
+            sizes="(min-width: 768px) 11rem, 10rem"
             alt="Danny O'Brien smiling in sunglasses outdoors"
             width="460"
             height="460"
