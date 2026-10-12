@@ -1,4 +1,4 @@
-import { copyFile, mkdir } from "node:fs/promises";
+import { copyFile } from "node:fs/promises";
 import { join } from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import devtools from "solid-devtools/vite";
@@ -16,7 +16,10 @@ logger.warn = (message, options) => {
 /** Routes in `src/App.tsx` that are linked to directly. Each gets its own copy of the page. */
 const ROUTES = ["projects", "blog", "about"];
 
-/** GitHub Pages 404s a path without a file and bounces it through 404.html; a copy per route serves it straight away. */
+/**
+ * GitHub Pages 404s a path without a file and bounces it through 404.html, and 301s `/about` to `/about/` for a
+ * folder. It serves `/about` from `about.html` directly, so each route gets a copy there.
+ */
 function routePages(): Plugin {
   let outDir = "";
   return {
@@ -27,8 +30,7 @@ function routePages(): Plugin {
     },
     async closeBundle() {
       for (const route of ROUTES) {
-        await mkdir(join(outDir, route), { recursive: true });
-        await copyFile(join(outDir, "index.html"), join(outDir, route, "index.html"));
+        await copyFile(join(outDir, "index.html"), join(outDir, `${route}.html`));
       }
     },
   };
