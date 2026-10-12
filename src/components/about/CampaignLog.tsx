@@ -114,17 +114,26 @@ export function CampaignLog() {
         Experience
       </h2>
 
-      <div ref={wrapper} class="relative grid grid-cols-[3.25rem_minmax(0,1fr)] gap-x-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-x-10">
+      <div
+        ref={wrapper}
+        class="relative grid grid-cols-[3.25rem_minmax(0,1fr)] gap-x-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-x-10"
+      >
         <div ref={mapColumn} class="relative" aria-hidden="true">
           <Show when={map()}>
             {(layout) => (
               <svg
+                aria-hidden="true"
                 class="absolute inset-0 overflow-visible"
                 width={layout().width}
                 height={layout().height}
                 viewBox={`0 0 ${layout().width} ${layout().height}`}
               >
-                <g filter="url(#sketch)" class="fill-none stroke-ink-soft" stroke-linecap="round" stroke-linejoin="round">
+                <g
+                  filter="url(#sketch)"
+                  class="fill-none stroke-ink-soft"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
                   <path d={layout().path} stroke-width="1.8" stroke-dasharray="5 6" />
                   <g class="stroke-ink-soft/70" stroke-width="1.5">
                     <For each={layout().scenery}>
@@ -179,14 +188,8 @@ export function CampaignLog() {
         <ol class="grid">
           <For each={positions}>
             {(position, i) => (
-              <li
-                ref={(el) => (items[i()] = el)}
-                id={`campaign-${position.id}`}
-                class="grid gap-1.5 pb-16"
-              >
-                <h3 class="text-xl leading-tight font-bold sm:text-2xl">
-                  {position.title}
-                </h3>
+              <li ref={(el) => (items[i()] = el)} id={`campaign-${position.id}`} class="grid gap-1.5 pb-16">
+                <h3 class="text-xl leading-tight font-bold sm:text-2xl">{position.title}</h3>
                 <p class="text-lg leading-snug">{position.company}</p>
                 <EntryMeta start={position.start} end={position.end} location={position.location} tenure />
                 <Show when={position.highlights.length}>
@@ -208,9 +211,7 @@ export function CampaignLog() {
             )}
           </For>
           <li ref={(el) => (items[positions.length] = el)} id={`campaign-${education.id}`} class="grid gap-1.5">
-            <h3 class="text-xl leading-tight font-bold sm:text-2xl">
-              {education.school}
-            </h3>
+            <h3 class="text-xl leading-tight font-bold sm:text-2xl">{education.school}</h3>
             <p class="text-lg leading-snug">{education.degree}</p>
             <p class="leading-snug">{education.specialization}</p>
             <EntryMeta start={education.start} end={education.end} location={education.location} />

@@ -18,15 +18,9 @@ export const badgeVariants = cva(
   },
 );
 
-type BadgeProps = JSX.HTMLAttributes<HTMLSpanElement> &
-  VariantProps<typeof badgeVariants>;
+type BadgeProps = JSX.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof badgeVariants>;
 
 export function Badge(props: BadgeProps) {
   const [local, rest] = splitProps(props, ["class", "variant"]);
-  return (
-    <span
-      class={cn(badgeVariants({ variant: local.variant }), local.class)}
-      {...rest}
-    />
-  );
+  return <span class={cn(badgeVariants({ variant: local.variant }), local.class)} {...rest} />;
 }

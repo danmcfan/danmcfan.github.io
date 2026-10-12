@@ -9,9 +9,7 @@ export function ProjectsPage() {
 
   return (
     <div class="grid gap-8 md:grid-cols-2">
-      <For each={projects}>
-        {(project) => <ProjectLinkCard project={project} />}
-      </For>
+      <For each={projects}>{(project) => <ProjectLinkCard project={project} />}</For>
     </div>
   );
 }

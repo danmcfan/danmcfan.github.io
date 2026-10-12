@@ -10,8 +10,7 @@ export const projects: Project[] = [
   {
     icon: "gamepad",
     name: "Pixel Arcade",
-    description:
-      "Pixel art classic arcade machines within a browser game engine.",
+    description: "Pixel art classic arcade machines within a browser game engine.",
     tags: ["Go", "WebAssembly", "Ebitengine"],
     href: "https://arcade.dannyobrien.dev",
   },

@@ -1,2 +1,5 @@
 node_modules/
 dist/
+test-results/
+# Built from src/data/resume.ts by `bun run resume`.
+public/Daniel_OBrien_Resume.pdf

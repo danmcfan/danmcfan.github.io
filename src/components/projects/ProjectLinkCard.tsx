@@ -1,6 +1,6 @@
 import { For } from "solid-js";
 
-import { type Project } from "../../data/projects";
+import type { Project } from "../../data/projects";
 import { cn } from "../../lib/cn";
 import { Badge } from "../ui/badge";
 import { cardVariants } from "../ui/card";

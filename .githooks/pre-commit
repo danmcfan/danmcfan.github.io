@@ -1,0 +1,6 @@
+#!/bin/sh
+# Fast gate: types, lint and unit tests. The build runs before push.
+set -e
+bun run typecheck
+bun run lint
+bun run test

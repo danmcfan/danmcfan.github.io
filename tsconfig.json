@@ -1,20 +1,9 @@
 {
+  // App code: runs in the browser through Vite.
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    // General
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "target": "ESNext",
-
-    // Modules
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "noEmit": true,
-
-    // Type Checking & Safety
-    "strict": true,
-    "types": ["vite/client", "bun"]
-  }
+    "types": ["vite/client"]
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts"]
 }

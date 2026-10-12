@@ -1,0 +1,8 @@
+{
+  // Vite config: run by Node. Kept apart from Bun's types, which clash with Vite's.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["vite.config.ts"]
+}

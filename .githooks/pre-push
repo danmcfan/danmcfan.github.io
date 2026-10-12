@@ -1,0 +1,4 @@
+#!/bin/sh
+# Full gate, the same one CI runs.
+set -e
+bun run check

@@ -6,8 +6,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         ink: "bg-ink text-parchment hover:bg-dragon",
-        outline:
-          "border border-ink/50 bg-card/60 text-ink hover:border-dragon hover:text-dragon",
+        outline: "border border-ink/50 bg-card/60 text-ink hover:border-dragon hover:text-dragon",
         ghost: "text-ink hover:text-dragon",
       },
       size: {
