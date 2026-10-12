@@ -1,24 +1,136 @@
-@import url("https://fonts.googleapis.com/css2?family=Metamorphous&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import "@fontsource/alegreya/latin-400.css";
+@import "@fontsource/alegreya/latin-400-italic.css";
+@import "@fontsource/alegreya/latin-700.css";
+@import "@fontsource/caveat/latin-500.css";
+@import "@fontsource/im-fell-english-sc/latin-400.css";
+@import "@fontsource/jetbrains-mono/latin-400.css";
 
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Metamorphous", Georgia, serif;
-  --font-mono: "Space Mono", monospace;
+  --color-desk: #e8e6dc;
+  --color-parchment: #f1e3c3;
+  --color-parchment-deep: #e0c99a;
+  --color-card: #fbf6e8;
+  --color-ink: #2e2219;
+  --color-ink-soft: #5d4b3b;
+  --color-dragon: #8e2b1f;
+  --color-gold: #a87b22;
+  --color-pencil: #2f63a8;
+  --color-verdigris: #3f6f68;
+  --color-wash-sky: #a9c4d8;
+  --color-wash-sage: #b7c79c;
+  --color-wash-ochre: #e2b765;
+  --color-wash-rose: #d99b8a;
+
+  --font-display: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --font-serif: "Alegreya", "Iowan Old Style", Georgia, serif;
+  --font-hand: "Caveat", "Bradley Hand", "Segoe Print", cursive;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  --animate-page-in: page-in 0.35s ease-out both;
+
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
 }
 
-html,
-body,
-#root {
-  min-height: 100%;
+/* shadcn-style semantic aliases */
+@theme inline {
+  --color-background: var(--color-parchment);
+  --color-foreground: var(--color-ink);
+  --color-primary: var(--color-dragon);
+  --color-muted: var(--color-parchment-deep);
+  --color-muted-foreground: var(--color-ink-soft);
+  --color-accent: var(--color-gold);
+  --color-border: color-mix(in oklab, var(--color-ink) 30%, transparent);
+  --color-ring: var(--color-pencil);
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-mono);
+@utility bg-graph {
+  background-color: var(--color-desk);
+  background-image:
+    linear-gradient(rgb(70 115 160 / 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(70 115 160 / 0.3) 1px, transparent 1px),
+    linear-gradient(rgb(70 115 160 / 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(70 115 160 / 0.16) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
 }
 
-a {
-  color: inherit;
+@utility bg-parchment-sheet {
+  background-color: var(--color-parchment);
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35 0 0 0 0 .24 0 0 0 0 .12 0 0 0 .11 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    radial-gradient(ellipse at 20% 0%, rgb(255 248 225 / 0.7), transparent 60%);
+  box-shadow:
+    inset 0 0 90px rgb(140 95 35 / 0.28),
+    0 18px 40px -18px rgb(60 40 15 / 0.45);
+}
+
+@layer base {
+  html {
+    background: var(--color-desk);
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-serif);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px dashed var(--color-ring);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}
+
+/* Hand-drawn strokes that draw themselves in. Paths use pathLength="1". */
+.ink-stroke {
+  fill: none;
+  stroke: var(--color-dragon);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition:
+    stroke-dashoffset 0.5s cubic-bezier(0.6, 0.05, 0.3, 1),
+    opacity 0s 0.5s;
+}
+
+[aria-current="page"] > .ink-loop .ink-stroke,
+.group:hover .ink-underline .ink-stroke,
+.group:focus-visible .ink-underline .ink-stroke {
+  stroke-dashoffset: 0;
+  opacity: 1;
+  transition:
+    stroke-dashoffset 0.5s cubic-bezier(0.6, 0.05, 0.3, 1),
+    opacity 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

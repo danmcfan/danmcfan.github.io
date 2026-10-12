@@ -1,6 +1,9 @@
 import { For } from "solid-js";
 
 import { type Post } from "../../data/posts";
+import { cn } from "../../lib/cn";
+import { cardVariants } from "../ui/card";
+import { InkUnderline } from "../ui/ink";
 
 type PostListProps = {
   posts: Post[];
@@ -8,20 +11,21 @@ type PostListProps = {
 
 export function PostList(props: PostListProps) {
   return (
-    <ul class="space-y-4">
+    <ul class="grid gap-5">
       <For each={props.posts}>
         {(post) => (
-          <li class="rounded-lg border border-emerald-600/70 bg-emerald-900/50 hover:bg-emerald-700/70 transition-colors cursor-pointer p-4">
-            <p class="text-xs tracking-wide text-emerald-200 uppercase">
-              {post.date}
-            </p>
+          <li>
             <a
               href={post.href}
-              class="mt-1 block font-serif text-xl text-emerald-50 transition hover:text-amber-200"
+              class={cn(cardVariants({ variant: "notice" }), "group gap-1 p-5 no-underline")}
             >
-              {post.title}
+              <span class="font-mono text-xs text-ink-soft">{post.date}</span>
+              <span class="relative self-start font-display text-2xl">
+                {post.title}
+                <InkUnderline />
+              </span>
+              <span class="mt-1">{post.excerpt}</span>
             </a>
-            <p class="mt-2 text-emerald-100">{post.excerpt}</p>
           </li>
         )}
       </For>

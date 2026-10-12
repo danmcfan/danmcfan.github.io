@@ -10,5 +10,7 @@ export default defineConfig({
   },
   build: {
     target: "esnext",
+    // three.js lives in its own lazily loaded dice chunk (~130 kB gzip).
+    chunkSizeWarningLimit: 600,
   },
 });

@@ -3,6 +3,7 @@ import { Navigate, Route, Router } from "@solidjs/router";
 import { Layout } from "./layout/Layout";
 import { AboutPage } from "./pages/AboutPage";
 import { BlogPage } from "./pages/BlogPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
 
 function ProjectsRedirect() {
@@ -16,7 +17,7 @@ export function App() {
       <Route path="/projects" component={ProjectsPage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/about" component={AboutPage} />
-      <Route path="*404" component={ProjectsRedirect} />
+      <Route path="*404" component={NotFoundPage} />
     </Router>
   );
 }

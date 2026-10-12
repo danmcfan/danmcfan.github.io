@@ -1,7 +1,9 @@
 import { PostList } from "../components/blog/PostList";
-import { QuestDivider } from "../components/ornaments/QuestDivider";
 import { posts } from "../data/posts";
+import { usePageTitle } from "../lib/usePageTitle";
 
 export function BlogPage() {
+  usePageTitle("Adventure Log");
+
   return <PostList posts={posts} />;
 }
