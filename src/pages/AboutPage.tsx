@@ -2,6 +2,7 @@ import { For } from "solid-js";
 
 import { CampaignLog } from "../components/about/CampaignLog";
 import { SocialLinks } from "../components/about/SocialLinks";
+import { Badge } from "../components/ui/badge";
 import { SheetBox } from "../components/ui/card";
 import { SheetField } from "../components/ui/sheet";
 import { careerStart, positions } from "../data/positions";
@@ -14,7 +15,13 @@ const skills = [
   {
     group: "Cloud infrastructure",
     items: [
-      "AWS (ECS Fargate, ALB, Secrets Manager, S3, Lambda, EC2, IAM)",
+      "AWS ECS Fargate",
+      "AWS ALB",
+      "AWS Secrets Manager",
+      "AWS S3",
+      "AWS Lambda",
+      "AWS EC2",
+      "AWS IAM",
       "Terraform",
       "Docker",
       "Kubernetes",
@@ -38,25 +45,6 @@ const skills = [
   {
     group: "DevOps & practice",
     items: ["GitHub Actions CI/CD", "Git", "Agile/Scrum", "Test-driven development", "System design"],
-  },
-];
-
-const focus = [
-  {
-    name: "Cloud infrastructure",
-    text: "Secure, compliant AWS stacks built with Terraform, Docker, ECS Fargate and Kubernetes, with credentials kept in Secrets Manager.",
-  },
-  {
-    name: "Production AI",
-    text: "Computer vision models trained, optimized and served with PyTorch and FastAPI, and a training platform that cut client onboarding from two weeks to one day.",
-  },
-  {
-    name: "Data at scale",
-    text: "A media catalog indexing 10 TB a day, ClickHouse analytics over billions of sensor readings, and Python pipelines made 70% faster.",
-  },
-  {
-    name: "Full-stack geospatial apps",
-    text: "React mapping tools for drone, satellite and inspection data, backed by FastAPI and gRPC services in Python and Go.",
   },
 ];
 
@@ -86,39 +74,43 @@ export function AboutPage() {
             <p class="font-mono text-xs tracking-[0.12em] text-ink-soft uppercase">Cloud infrastructure · Production AI · Full stack</p>
           </div>
           <p class="max-w-[62ch] text-lg leading-relaxed">
-            Senior software engineer with {years}+ years of experience architecting secure, high-scale cloud
-            infrastructure and production AI systems, after starting out as a geospatial engineer. I modernize stacks
-            with AWS, Terraform and Docker, build pipelines that handle 10 TB of data a day, and ship full-stack
-            products in Python, Go and React. Outside of work I&apos;m usually backpacking, rock climbing or surfing.
+            Senior Software Engineer with 5+ years of experience architecting secure, high-scale cloud
+            infrastructure and production AI systems. Expert in modernizing enterprise tech stacks using AWS (ECS
+            Fargate, Secrets Manager), Terraform, and Docker, with a proven track record of optimizing pipelines to
+            handle 10TB of daily data. Specialized in delivering business-critical full-stack solutions using Python,
+            Go, and React while driving strict security compliance and operational efficiency. Outside of work, I am
+            an avid outdoorsman who enjoys backpacking, rock climbing, and surfing.
           </p>
-          <dl class="grid grid-cols-2 gap-x-6 gap-y-4 rounded-[6px_10px_6px_10px] border-2 border-ink bg-card/60 p-4 lg:grid-cols-4">
+        </div>
+      </header>
+
+      <div class="grid gap-x-6 gap-y-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+        <SheetBox label="About" class="pb-6">
+          <dl class="grid flex-1 content-between gap-5">
             <SheetField label="Currently">{current.company}</SheetField>
             <SheetField label="Based in">San Diego, CA</SheetField>
             <SheetField label="Experience">{years}+ years</SheetField>
             <SheetField label="Education">B.S., UC Davis</SheetField>
           </dl>
-        </div>
-      </header>
-
-      <div class="grid gap-x-6 gap-y-10 md:grid-cols-2">
-        <SheetBox label="Focus" class="gap-4 pb-6">
-          <For each={focus}>
-            {(item) => (
-              <div>
-                <h4 class="font-bold leading-snug">{item.name}</h4>
-                <p class="leading-snug text-ink-soft">{item.text}</p>
-              </div>
-            )}
-          </For>
         </SheetBox>
 
         <SheetBox label="Skills" class="pb-6">
-          <dl class="grid gap-3">
+          <dl class="grid gap-4">
             <For each={skills}>
               {(row) => (
                 <div class="grid gap-0.5">
                   <dt class="font-mono text-xs leading-5 tracking-[0.1em] text-ink-soft uppercase">{row.group}</dt>
-                  <dd class="m-0 leading-snug">{row.items.join(" · ")}</dd>
+                  <dd class="m-0">
+                    <ul class="flex flex-wrap gap-1.5">
+                      <For each={row.items}>
+                        {(item) => (
+                          <li>
+                            <Badge>{item}</Badge>
+                          </li>
+                        )}
+                      </For>
+                    </ul>
+                  </dd>
                 </div>
               )}
             </For>
