@@ -17,20 +17,15 @@ export function AboutPage() {
 
   return (
     <div class="grid gap-8 md:grid-cols-[16rem_1fr]">
-      <figure class="relative self-start">
-        <div
-          class="absolute -inset-3 rounded-[46%_54%_48%_52%/55%_45%_55%_45%] bg-[radial-gradient(circle_at_30%_30%,var(--color-wash-sky),transparent_65%),radial-gradient(circle_at_70%_75%,var(--color-wash-ochre),transparent_60%)] opacity-80 mix-blend-multiply"
-          style={{ filter: "url(#watercolor)" }}
-          aria-hidden="true"
-        />
+      <figure class="self-start">
         <img
-          class="relative aspect-square w-full border-2 border-ink bg-card object-cover p-1.5 shadow-[0_8px_14px_-8px_rgb(40_25_10/0.55)]"
+          class="aspect-square w-full border-2 border-ink bg-card object-cover p-1.5 shadow-[0_8px_14px_-8px_rgb(40_25_10/0.55)]"
           src="/headshot.jpeg"
           alt="Danny O'Brien smiling in sunglasses outdoors"
           width="460"
           height="460"
         />
-        <figcaption class="relative mt-2 text-center font-hand text-xl text-pencil">
+        <figcaption class="mt-2 text-center font-hand text-xl text-pencil">
           portrait of the mage, on a sunny day
         </figcaption>
       </figure>

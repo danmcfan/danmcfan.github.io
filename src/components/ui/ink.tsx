@@ -1,12 +1,12 @@
 import { cn } from "../../lib/cn";
 
-/** SVG filter that roughens edges so flat shapes read as watercolour washes. */
-export function WatercolorFilter() {
+/** SVG filter that wobbles strokes so icons read as pencil doodles. */
+export function SketchFilter() {
   return (
     <svg width="0" height="0" class="absolute" aria-hidden="true">
-      <filter id="watercolor" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="noise" />
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G" />
+      <filter id="sketch" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="3" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </svg>
   );

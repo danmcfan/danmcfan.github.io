@@ -26,7 +26,7 @@ import {
 
 type RollDiceOptions = {
   canvas: HTMLCanvasElement;
-  /** The parchment sheet. Dice land in the desk margins around it. */
+  /** The centred content column. Dice land in the margins around it. */
   sheet: HTMLElement;
   /** Empty area in the header reserved for dice. */
   tray: HTMLElement;
@@ -169,7 +169,7 @@ function layout(root: DOMRect, sheet: DOMRect, tray: DOMRect, viewportHeight: nu
     });
   }
 
-  // Desk margins on either side of the sheet, when there is room.
+  // Margins on either side of the content column, when there is room.
   const margin = sheet.left - root.left;
   if (margin >= 96) {
     const size = Math.min(64, margin * 0.45);

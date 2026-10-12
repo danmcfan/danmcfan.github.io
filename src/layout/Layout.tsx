@@ -3,7 +3,7 @@ import { createEffect, on, type JSX } from "solid-js";
 
 import { DiceLayer } from "../components/dice/DiceLayer";
 import { NavBar } from "../components/navigation/NavBar";
-import { InkRule, WatercolorFilter } from "../components/ui/ink";
+import { InkRule, SketchFilter } from "../components/ui/ink";
 import { socials } from "../data/socials";
 
 type LayoutProps = {
@@ -30,11 +30,11 @@ export function Layout(props: LayoutProps) {
   );
 
   return (
-    <div class="relative min-h-dvh overflow-x-clip bg-graph px-4 py-6 text-ink md:py-12">
-      <WatercolorFilter />
+    <div class="relative flex min-h-dvh flex-col overflow-x-clip bg-parchment-page text-ink">
+      <SketchFilter />
       <div
         ref={sheet}
-        class="relative mx-auto flex min-h-[calc(100dvh-3rem)] w-full max-w-5xl flex-col rounded-[3px_5px_4px_6px] bg-parchment-sheet px-5 py-8 md:min-h-[calc(100dvh-6rem)] md:px-14 md:py-12"
+        class="relative mx-auto flex w-full max-w-5xl flex-1 flex-col px-5 py-8 md:px-14 md:py-12"
       >
         <header class="grid gap-x-6 md:grid-cols-[1fr_minmax(0,20rem)]">
           <div

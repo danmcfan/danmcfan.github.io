@@ -41,39 +41,29 @@ const doodles: Record<Project["icon"], () => JSX.Element> = {
   ),
 };
 
-const washes: Record<Project["icon"], [string, string]> = {
-  gamepad: ["var(--color-wash-ochre)", "var(--color-wash-rose)"],
-  sprout: ["var(--color-wash-sage)", "var(--color-wash-ochre)"],
-  cpu: ["var(--color-wash-sky)", "var(--color-wash-sage)"],
-  "check-check": ["var(--color-wash-rose)", "var(--color-wash-sky)"],
-};
-
 type QuestDoodleProps = {
   icon: Project["icon"];
+  class?: string;
 };
 
+/** Project icon drawn twice with a wobble filter, like a pencil sketch. */
 export function QuestDoodle(props: QuestDoodleProps) {
-  const wash = () => washes[props.icon];
   return (
-    <div class="relative h-28 overflow-hidden" aria-hidden="true">
-      <div
-        class="absolute inset-2 rounded-[40%_60%_55%_45%/50%_40%_60%_50%] mix-blend-multiply"
-        style={{
-          filter: "url(#watercolor)",
-          background: `radial-gradient(circle at 35% 40%, ${wash()[0]}, transparent 65%), radial-gradient(circle at 70% 62%, ${wash()[1]}, transparent 60%)`,
-        }}
-      />
-      <svg
-        class="absolute inset-0 m-auto size-16 text-ink"
-        viewBox="0 0 64 64"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        {doodles[props.icon]()}
-      </svg>
-    </div>
+    <svg
+      class={props.class}
+      viewBox="0 0 64 64"
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <g filter="url(#sketch)">
+        <g stroke-width="2.4">{doodles[props.icon]()}</g>
+        <g stroke-width="1.2" opacity="0.45" transform="translate(1.1 0.8) rotate(1.5 32 32)">
+          {doodles[props.icon]()}
+        </g>
+      </g>
+    </svg>
   );
 }
