@@ -1,4 +1,4 @@
-import { For, Show } from "solid-js";
+import { For } from "solid-js";
 
 import { AboutCard } from "../components/about/AboutCard";
 import { CampaignLog } from "../components/about/CampaignLog";
@@ -11,9 +11,6 @@ import { cn } from "../lib/cn";
 import { usePageTitle } from "../lib/usePageTitle";
 
 const YEAR = 365.25 * 24 * 60 * 60 * 1000;
-
-const roles = ["Full Stack", "Backend", "Frontend"];
-const languages = ["Python", "Go", "TypeScript"];
 
 const skills = [
   {
@@ -84,33 +81,7 @@ export function AboutPage() {
         </div>
 
         <div class="grid content-start gap-5">
-          <div class="grid gap-2">
-            <h2 class="font-display text-3xl leading-tight text-dragon md:text-4xl">{current.title}</h2>
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <ul class="flex flex-wrap items-center gap-x-2.5 font-mono text-xs tracking-[0.12em] text-ink-soft uppercase" aria-label="Roles">
-                <For each={roles}>
-                  {(role, i) => (
-                    <li class="flex items-center gap-2.5">
-                      <Show when={i() > 0}>
-                        <span class="size-1.5 rotate-45 bg-dragon/80" aria-hidden="true" />
-                      </Show>
-                      {role}
-                    </li>
-                  )}
-                </For>
-              </ul>
-              <span class="hidden h-4 w-px bg-ink/30 sm:block" aria-hidden="true" />
-              <ul class="flex flex-wrap gap-1.5" aria-label="Languages">
-                <For each={languages}>
-                  {(language) => (
-                    <li>
-                      <Badge>{language}</Badge>
-                    </li>
-                  )}
-                </For>
-              </ul>
-            </div>
-          </div>
+          <h2 class="font-display text-3xl leading-tight text-dragon md:text-4xl">{current.title}</h2>
           <p class="max-w-[62ch] text-lg leading-relaxed">
             Senior Software Engineer with 5+ years of experience architecting secure, high-scale cloud
             infrastructure and production AI systems. Expert in modernizing enterprise tech stacks using AWS (ECS
