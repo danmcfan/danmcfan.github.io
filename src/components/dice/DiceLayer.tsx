@@ -11,7 +11,8 @@ export function DiceLayer(props: DiceLayerProps) {
   let dispose: (() => void) | undefined;
   let cancelled = false;
 
-  onMount(() => {
+  const start = () => {
+    if (cancelled) return;
     import("./rollDice")
       .then(({ rollDice }) => {
         if (cancelled) return;
@@ -24,10 +25,21 @@ export function DiceLayer(props: DiceLayerProps) {
       .catch(() => {
         // Dice are decoration; a failed chunk or missing WebGL leaves the page as is.
       });
+  };
+
+  // The dice chunk is the page's heaviest download, so it waits until the page has loaded and painted.
+  // A callback two frames on runs once the first frame is on screen.
+  const startAfterPaint = () =>
+    requestAnimationFrame(() => requestAnimationFrame(() => (window.requestIdleCallback ?? setTimeout)(start)));
+
+  onMount(() => {
+    if (document.readyState === "complete") startAfterPaint();
+    else window.addEventListener("load", startAfterPaint, { once: true });
   });
 
   onCleanup(() => {
     cancelled = true;
+    window.removeEventListener("load", startAfterPaint);
     dispose?.();
   });
 

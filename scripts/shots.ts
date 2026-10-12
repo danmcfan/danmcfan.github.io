@@ -135,7 +135,8 @@ try {
   run(["git", "worktree", "add", "--detach", worktree, sha]);
   run(["bun", "install", "--frozen-lockfile"], worktree);
   const beforeBuild = resolve(OUT, "build-before");
-  run(["bun", "--bunx", "vite", "build", "--outDir", beforeBuild], worktree);
+  // The outDir sits outside the worktree, which vite warns about (and a warning fails the build) unless told to empty it.
+  run(["bun", "--bunx", "vite", "build", "--outDir", beforeBuild, "--emptyOutDir"], worktree);
   const baseResume = join(worktree, "scripts/resume-html.ts");
   const beforeResume = existsSync(baseResume) ? (await import(baseResume)).resumeHtml : undefined;
   await capture(browser, "before", worktree, beforeBuild, 4174, beforeResume);
