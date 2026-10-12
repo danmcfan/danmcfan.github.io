@@ -44,7 +44,7 @@ export function Layout(props: LayoutProps) {
           />
           <div class="grid gap-3 md:col-start-1 md:row-start-1">
             <p class="font-mono text-xs tracking-[0.18em] text-ink-soft uppercase">
-              Software Engineer
+              Senior Software Engineer
             </p>
             <h1 class="font-display text-5xl leading-none text-dragon md:text-6xl">
               Danny O&apos;Brien
@@ -71,10 +71,11 @@ export function Layout(props: LayoutProps) {
                   <a
                     class="underline decoration-ink/30 underline-offset-4 hover:text-dragon hover:decoration-wavy"
                     href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    {...(social.download
+                      ? { download: social.download }
+                      : { target: "_blank", rel: "noopener noreferrer" })}
                   >
-                    {social.kind === "github" ? "GitHub" : "LinkedIn"}
+                    {social.label}
                   </a>
                 </li>
               ))}

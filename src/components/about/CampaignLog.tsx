@@ -4,15 +4,14 @@ import { education, formatMonth, type Landmark, positions } from "../../data/pos
 import { Badge } from "../ui/badge";
 import { compassPath, landmarkPaths, type SceneryKind, sceneryPaths } from "./mapDoodles";
 
-type Stop = { id: string; landmark: Landmark; label: string };
+type Stop = { landmark: Landmark; label: string };
 
 const stops: Stop[] = [
   ...positions.map((position) => ({
-    id: position.id,
     landmark: position.landmark,
     label: position.location.split(",")[0],
   })),
-  { id: education.id, landmark: education.landmark, label: "UC Davis" },
+  { landmark: education.landmark, label: "UC Davis" },
 ];
 
 const sceneryCycle: SceneryKind[] = ["pines", "mountains", "hills", "waves", "tree", "mountains", "pines"];
@@ -58,20 +57,13 @@ type MapLayout = {
   scenery: { kind: SceneryKind; x: number; y: number; scale: number }[];
 };
 
-/** Work history beside a hand-drawn map whose trail is inked in as the reader scrolls. */
+/** Work history beside a static, hand-drawn map of where it happened. */
 export function CampaignLog() {
   let wrapper!: HTMLDivElement;
   let mapColumn!: HTMLDivElement;
-  let trail: SVGPathElement | undefined;
   const items: HTMLElement[] = [];
 
   const [map, setMap] = createSignal<MapLayout>();
-  const [travelled, setTravelled] = createSignal(0);
-  const [active, setActive] = createSignal(-1);
-
-  // Trail length sampled against height, so a scroll position maps to a point on the path.
-  let samples: { length: number; y: number }[] = [];
-  let totalLength = 0;
 
   const measure = () => {
     const width = mapColumn.clientWidth;
@@ -118,74 +110,12 @@ export function CampaignLog() {
     setMap({ width, height, stops: points, path: smoothPath(route), scenery });
   };
 
-  const sampleTrail = () => {
-    if (!trail) return;
-    totalLength = trail.getTotalLength();
-    samples = Array.from({ length: 241 }, (_, i) => {
-      const length = (totalLength * i) / 240;
-      return { length, y: trail!.getPointAtLength(length).y };
-    });
-  };
-
-  const follow = () => {
-    const layout = map();
-    if (!layout || !trail || !samples.length) return;
-    const anchor = window.innerHeight * 0.5 - wrapper.getBoundingClientRect().top;
-    const y = Math.min(Math.max(anchor, 0), layout.height);
-
-    let i = samples.findIndex((sample) => sample.y >= y);
-    if (i === -1) i = samples.length - 1;
-    const a = samples[Math.max(i - 1, 0)];
-    const b = samples[i];
-    const t = b.y === a.y ? 1 : (y - a.y) / (b.y - a.y);
-    const length = a.length + (b.length - a.length) * t;
-
-    setTravelled(length);
-
-    let reached = -1;
-    layout.stops.forEach((stop, index) => {
-      if (stop.y <= y + 6) reached = index;
-    });
-    setActive(reached);
-  };
-
-  const refresh = () => {
-    measure();
-    // Wait for the new path to render before sampling it.
-    requestAnimationFrame(() => {
-      sampleTrail();
-      follow();
-    });
-  };
-
-  let frame = 0;
-  const onScroll = () => {
-    if (frame) return;
-    frame = requestAnimationFrame(() => {
-      frame = 0;
-      follow();
-    });
-  };
-
+  // The map is redrawn only when the entries beside it reflow.
   onMount(() => {
-    const observer = new ResizeObserver(refresh);
+    const observer = new ResizeObserver(measure);
     observer.observe(wrapper);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    onCleanup(() => {
-      observer.disconnect();
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    });
+    onCleanup(() => observer.disconnect());
   });
-
-  const visit = (id: string) => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document
-      .getElementById(`campaign-${id}`)
-      ?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
-  };
 
   return (
     <section aria-labelledby="experience" class="grid gap-6">
@@ -203,16 +133,6 @@ export function CampaignLog() {
                 height={layout().height}
                 viewBox={`0 0 ${layout().width} ${layout().height}`}
               >
-                <mask id="trail-reveal" maskUnits="userSpaceOnUse" x="-20" y="-20" width={layout().width + 40} height={layout().height + 40}>
-                  <path
-                    d={layout().path}
-                    fill="none"
-                    stroke="white"
-                    stroke-width="12"
-                    stroke-dasharray={`${travelled()} ${totalLength + 1}`}
-                  />
-                </mask>
-
                 <g filter="url(#sketch)" class="fill-none stroke-ink-soft/60" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                   <Show when={layout().width >= 120}>
                     <g transform={`translate(${layout().width * 0.12} 2)`}>
@@ -230,22 +150,12 @@ export function CampaignLog() {
                 </g>
 
                 <path
-                  ref={(el) => (trail = el)}
                   d={layout().path}
                   fill="none"
-                  class="stroke-ink/35"
+                  class="stroke-ink/45"
                   stroke-width="2"
                   stroke-dasharray="1 7"
                   stroke-linecap="round"
-                />
-                <path
-                  d={layout().path}
-                  fill="none"
-                  class="stroke-dragon"
-                  stroke-width="2.4"
-                  stroke-dasharray="7 6"
-                  stroke-linecap="round"
-                  mask="url(#trail-reveal)"
                 />
 
                 <Index each={layout().stops}>
@@ -255,21 +165,12 @@ export function CampaignLog() {
                     const scale = () => (wide() ? 1 : 0.8);
                     const left = () => point().x < layout().width / 2;
                     return (
-                      <g
-                        class="cursor-pointer"
-                        transform={`translate(${point().x} ${point().y})`}
-                        onClick={() => visit(stop.id)}
-                      >
-                        <circle r="20" class="fill-transparent" />
+                      <g transform={`translate(${point().x} ${point().y})`}>
                         <path
                           d={landmarkPaths[stop.landmark]}
                           transform={`scale(${scale()})`}
                           filter="url(#sketch)"
-                          class="fill-card stroke-[1.8] transition-colors duration-300"
-                          classList={{
-                            "stroke-dragon": i <= active(),
-                            "stroke-ink-soft": i > active(),
-                          }}
+                          class="fill-card stroke-ink-soft stroke-[1.8]"
                           stroke-linejoin="round"
                           stroke-linecap="round"
                         />
@@ -278,8 +179,7 @@ export function CampaignLog() {
                             x={left() ? 22 : -22}
                             y="4"
                             text-anchor={left() ? "start" : "end"}
-                            class="font-hand text-[17px] transition-colors duration-300"
-                            classList={{ "fill-dragon": i <= active(), "fill-ink-soft": i > active() }}
+                            class="fill-ink-soft font-hand text-[17px]"
                           >
                             {stop.label}
                           </text>
@@ -301,10 +201,7 @@ export function CampaignLog() {
                 id={`campaign-${position.id}`}
                 class="grid gap-1 pb-10"
               >
-                <h3
-                  class="text-xl leading-tight font-bold transition-colors duration-300 sm:text-2xl"
-                  classList={{ "text-dragon": i() === active() }}
-                >
+                <h3 class="text-xl leading-tight font-bold sm:text-2xl">
                   {position.title}
                 </h3>
                 <p class="text-lg leading-snug">{position.company}</p>
@@ -338,13 +235,11 @@ export function CampaignLog() {
             )}
           </For>
           <li ref={(el) => (items[positions.length] = el)} id={`campaign-${education.id}`} class="grid gap-1">
-            <h3
-              class="text-xl leading-tight font-bold transition-colors duration-300 sm:text-2xl"
-              classList={{ "text-dragon": active() === positions.length }}
-            >
+            <h3 class="text-xl leading-tight font-bold sm:text-2xl">
               {education.school}
             </h3>
             <p class="text-lg leading-snug">{education.degree}</p>
+            <p class="leading-snug">{education.specialization}</p>
             <p class="text-sm text-ink-soft">
               {education.years} · {education.location}
             </p>

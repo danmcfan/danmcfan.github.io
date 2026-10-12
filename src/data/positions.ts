@@ -32,12 +32,12 @@ export const positions: Position[] = [
     location: "Chicago, IL",
     landmark: "tower",
     highlights: [
-      "Deployed machine learning models with FastAPI, Docker and AWS ECS to process 100 GB of geospatial raster data a day for facility inspections.",
-      "Refactored Python data pipelines with parallelization and algorithm work, cutting average processing time by 70%.",
+      "Deployed machine learning models with FastAPI, Docker and AWS ECS Fargate, using Terraform for infrastructure and Secrets Manager for credentials, to process 100 GB of geospatial data a day under strict compliance.",
+      "Refactored Python data pipelines with parallelization and algorithm optimization, cutting average processing time by 70%.",
       "Delivered full-stack mapping apps in React and FastAPI for real-time geospatial analysis, improving user productivity by 500%.",
       "Optimized PyTorch computer vision models, raising accuracy 25% and halving inference time.",
     ],
-    tools: ["Python", "TypeScript", "React", "FastAPI", "PyTorch", "Docker", "AWS"],
+    tools: ["Python", "React", "FastAPI", "PyTorch", "Docker", "Terraform", "AWS ECS Fargate"],
   },
   {
     id: "aicadium",
@@ -48,12 +48,12 @@ export const positions: Position[] = [
     location: "San Diego, CA",
     landmark: "lighthouse",
     highlights: [
-      "Led a full-stack image and video management app in React, FastAPI and Go microservices, letting customers run custom vision models; productivity up 150%.",
-      "Built Go media pipelines handling 100,000 uploads (10 TB) a day with tagging and metadata extraction.",
-      "Architected a model training platform with FastAPI and PyTorch on Kubernetes, cutting client onboarding from two weeks to one day.",
-      "Designed the AWS infrastructure for training, inference and asset management, improving scalability and reliability by 60%.",
+      "Led a full-stack image and video management app in React, FastAPI and Go microservices, letting customers run custom vision models for classification, detection and segmentation; productivity up 150%.",
+      "Built a media catalog on DynamoDB indexing 100,000+ assets (10 TB) a day, with Redis orchestrating async video processing and shared state across microservices.",
+      "Architected a model training platform with FastAPI and PyTorch on Kubernetes, cutting client onboarding by 93%, from two weeks to one day.",
+      "Designed secure AWS infrastructure with load balancers, Secrets Manager credential rotation and multi-tenant isolation, improving scalability and reliability by 60%.",
     ],
-    tools: ["Go", "Python", "TypeScript", "React", "FastAPI", "PyTorch", "Kubernetes", "AWS"],
+    tools: ["Go", "Python", "React", "FastAPI", "PyTorch", "DynamoDB", "Redis", "Kubernetes", "AWS"],
   },
   {
     id: "seekops",
@@ -64,12 +64,12 @@ export const positions: Position[] = [
     location: "Austin, TX",
     landmark: "keep",
     highlights: [
-      "Built an interactive 3D map in React for methane emissions from 100+ monthly drone flights, cutting render time from 10 s to 2 s.",
+      "Built an interactive 3D map in React with WebSockets, streaming live methane emissions from drone flights and cutting render latency by 80%.",
       "Moved geospatial ingestion from REST to gRPC in Go: latency 200 ms → 50 ms, error rate 4.9% → 0.1%.",
-      "Parallelized Python geospatial pipelines, reducing processing time by 80%.",
-      "Ran Python and Go microservices on Docker and Kubernetes, speeding deploys by 50%.",
+      "Integrated ClickHouse for OLAP analytics on drone IoT sensor streams, querying billions of points with sub-second latency.",
+      "Deployed Python and Go microservices on Docker and Kubernetes in AWS with least-privilege IAM, speeding deploys by 50%.",
     ],
-    tools: ["Go", "Python", "TypeScript", "React", "gRPC", "Docker", "Kubernetes"],
+    tools: ["Go", "Python", "React", "gRPC", "WebSockets", "ClickHouse", "Kubernetes", "AWS"],
   },
   {
     id: "benson-hill",
@@ -110,7 +110,8 @@ export const education = {
   id: "uc-davis",
   school: "University of California, Davis",
   degree: "B.S. Environmental Science",
-  years: "2016 – 2019",
+  specialization: "Specialization in Geospatial Information Systems",
+  years: "Sep 2016 – Jun 2019",
   location: "Davis, CA",
   landmark: "camp" as Landmark,
 };
@@ -122,7 +123,9 @@ export function formatMonth(value: string) {
   return `${MONTHS[month - 1]} ${year}`;
 }
 
+/** Start of the first software or data engineering role, which the resume counts experience from. */
 export function careerStart() {
-  const [year, month] = positions[positions.length - 1].start.split("-").map(Number);
+  const first = positions.findLast((position) => position.id !== "far-western")!;
+  const [year, month] = first.start.split("-").map(Number);
   return new Date(year, month - 1, 1);
 }
