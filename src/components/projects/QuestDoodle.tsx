@@ -29,7 +29,6 @@ const doodles: Record<Project["icon"], () => JSX.Element> = {
     <>
       <path d="M18 16 h14 a16 16 0 0 1 0 32 h-14 z" />
       <path d="M6 24 h12 M6 40 h12 M48 32 h12" />
-      <circle cx="51" cy="32" r="0.5" />
     </>
   ),
   // Speech bubble with read ticks

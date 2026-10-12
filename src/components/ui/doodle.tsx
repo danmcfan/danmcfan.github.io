@@ -5,7 +5,7 @@ type DoodleProps = {
   class?: string;
 };
 
-/** Icon drawn twice with a wobble filter, like a pencil sketch. */
+/** Icon drawn with a gentle wobble, like a confident pencil sketch. */
 export function Doodle(props: DoodleProps) {
   return (
     <svg
@@ -17,11 +17,8 @@ export function Doodle(props: DoodleProps) {
       stroke-linejoin="round"
       aria-hidden="true"
     >
-      <g filter="url(#sketch)">
-        <g stroke-width="2.4">{props.draw()}</g>
-        <g stroke-width="1.2" opacity="0.45" transform="translate(1.1 0.8) rotate(1.5 32 32)">
-          {props.draw()}
-        </g>
+      <g filter="url(#sketch-soft)" stroke-width="2.6">
+        {props.draw()}
       </g>
     </svg>
   );
