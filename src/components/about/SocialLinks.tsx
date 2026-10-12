@@ -23,19 +23,22 @@ type SocialLinksProps = {
 
 export function SocialLinks(props: SocialLinksProps) {
   return (
-    <ul class={cn("flex flex-wrap gap-3", props.class)}>
+    <ul class={cn("flex flex-wrap gap-2", props.class)}>
       <For each={props.socials}>
         {(social) => (
           <li>
             <a
-              class={buttonVariants({ variant: "outline" })}
+              class={cn(
+                buttonVariants({ variant: "outline", size: "icon" }),
+                "transition-[color,border-color,translate] motion-safe:hover:-translate-y-0.5",
+              )}
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
+              title={labelByKind[social.kind]}
             >
-              <Dynamic component={iconByKind[social.kind]} class="size-4" aria-hidden="true" />
-              {labelByKind[social.kind]}
-              <span class="sr-only">(opens in new tab)</span>
+              <Dynamic component={iconByKind[social.kind]} class="size-5" aria-hidden="true" />
+              <span class="sr-only">{labelByKind[social.kind]} (opens in new tab)</span>
             </a>
           </li>
         )}

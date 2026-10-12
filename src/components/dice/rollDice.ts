@@ -1,28 +1,36 @@
 import {
   AmbientLight,
-  BoxGeometry,
   BufferGeometry,
   CanvasTexture,
   DirectionalLight,
-  DodecahedronGeometry,
   EdgesGeometry,
-  Float32BufferAttribute,
+  Euler,
   Group,
-  IcosahedronGeometry,
   LineBasicMaterial,
   LineSegments,
   Mesh,
   MeshBasicMaterial,
   MeshToonMaterial,
-  OctahedronGeometry,
   OrthographicCamera,
   PlaneGeometry,
   Quaternion,
+  Raycaster,
   Scene,
-  TetrahedronGeometry,
+  Vector2,
   Vector3,
   WebGLRenderer,
 } from "three";
+
+import {
+  FRAME_MS,
+  geometryFromPolyhedron,
+  type Polyhedron,
+  readFrame,
+  type Roll,
+  rollUntilFlat,
+  type Throw,
+} from "./physics";
+import { dicePolyhedra } from "./shapes";
 
 type RollDiceOptions = {
   canvas: HTMLCanvasElement;
@@ -35,16 +43,22 @@ type RollDiceOptions = {
 type Target = { x: number; y: number; size: number };
 
 type Die = {
+  kind: number;
   group: Group;
-  body: Group;
+  mesh: Mesh;
+  material: MeshToonMaterial;
   shadow: Mesh;
+  shadowMaterial: MeshBasicMaterial;
   target: Target;
-  start: { x: number; y: number };
-  finalRotation: Quaternion;
-  spinAxis: Vector3;
-  spinAngle: number;
-  delay: number;
-  duration: number;
+  /** Pixels per physics unit. */
+  scale: number;
+  roll: Roll;
+  /** World offset added to the scaled physics frames. */
+  offset: Vector3;
+  /** Horizontal drift blended in over the roll so the die settles on its target. */
+  correction: Vector3;
+  startAt: number;
+  rolling: boolean;
 };
 
 const INK = 0x2e2219;
@@ -60,60 +74,45 @@ const COLORS = [
   0x7aa6c9, // sky
 ];
 
-/** Pentagonal trapezohedron (d10), with kites kept planar. */
-function d10Geometry(): BufferGeometry {
-  const e = 0.1;
-  const h = (e * (1 + Math.cos(Math.PI / 5))) / (1 - Math.cos(Math.PI / 5));
-  const ring = Array.from({ length: 10 }, (_, k) => {
-    const a = (k * Math.PI) / 5;
-    return new Vector3(Math.cos(a), Math.sin(a), k % 2 === 0 ? e : -e);
-  });
-  const top = new Vector3(0, 0, h);
-  const bottom = new Vector3(0, 0, -h);
-  const tris: Vector3[][] = [];
-  for (let k = 0; k < 10; k += 2) {
-    const [a, b, c] = [ring[k], ring[(k + 1) % 10], ring[(k + 2) % 10]];
-    tris.push([top, a, b], [top, b, c]);
-  }
-  for (let k = 1; k < 10; k += 2) {
-    const [a, b, c] = [ring[k], ring[(k + 1) % 10], ring[(k + 2) % 10]];
-    tris.push([bottom, a, b], [bottom, b, c]);
-  }
-  const positions: number[] = [];
-  for (const [p, q, r] of tris) {
-    const normal = new Vector3().subVectors(q, p).cross(new Vector3().subVectors(r, p));
-    const centroid = new Vector3().add(p).add(q).add(r);
-    const ordered = normal.dot(centroid) >= 0 ? [p, q, r] : [p, r, q];
-    for (const v of ordered) positions.push(v.x, v.y, v.z);
-  }
-  const geometry = new BufferGeometry();
-  geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
-  geometry.computeVertexNormals();
-  geometry.scale(0.85, 0.85, 0.85);
-  return geometry;
+// The camera looks down at the table tilted toward the viewer, so dice resting flat still show their sides.
+const PITCH = (33 * Math.PI) / 180;
+const SIN = Math.sin(PITCH);
+const COS = Math.cos(PITCH);
+const CAMERA_DISTANCE = 3000;
+
+const random = (min: number, max: number) => min + Math.random() * (max - min);
+const smoothstep = (t: number) => t * t * (3 - 2 * t);
+
+function randomQuaternion() {
+  return new Quaternion().setFromEuler(new Euler(random(0, 7), random(0, 7), random(0, 7)));
 }
 
-function diceGeometries(): BufferGeometry[] {
-  return [
-    new IcosahedronGeometry(1),
-    new BoxGeometry(1.25, 1.25, 1.25),
-    new OctahedronGeometry(1),
-    d10Geometry(),
-    new DodecahedronGeometry(1),
-    new TetrahedronGeometry(1.15),
-  ];
+function randomSpin(speed: number) {
+  return new Vector3(random(-speed, speed), random(-speed, speed), random(-speed, speed));
 }
 
-/** Normal of the first face, used to land each die with a face toward the viewer. */
-function firstFaceNormal(geometry: BufferGeometry): Vector3 {
-  const position = geometry.getAttribute("position");
-  const index = geometry.getIndex();
-  const at = (i: number) => {
-    const j = index ? index.getX(i) : i;
-    return new Vector3(position.getX(j), position.getY(j), position.getZ(j));
+/** A throw onto the table from off the near side edge and above. */
+function throwIn(fromLeft: boolean): Throw {
+  const side = fromLeft ? 1 : -1;
+  const across = random(16, 20);
+  const back = random(4, 8);
+  const direction = new Vector3(side * across, 0, back).normalize();
+  return {
+    position: new Vector3(-side * across, random(5, 6), -back),
+    quaternion: randomQuaternion(),
+    velocity: direction.multiplyScalar(random(24, 28)).add(new Vector3(0, -2, 0)),
+    angularVelocity: randomSpin(20),
   };
-  const [a, b, c] = [at(0), at(1), at(2)];
-  return new Vector3().subVectors(b, a).cross(new Vector3().subVectors(c, a)).normalize();
+}
+
+/** A flick straight up from where the die rests. */
+function throwUp(height: number, quaternion: Quaternion): Throw {
+  return {
+    position: new Vector3(0, height, 0),
+    quaternion: quaternion.clone(),
+    velocity: new Vector3(random(-2, 2), random(18, 22), random(-2, 2)),
+    angularVelocity: randomSpin(30),
+  };
 }
 
 function shadowTexture(): CanvasTexture {
@@ -182,10 +181,6 @@ function layout(root: DOMRect, sheet: DOMRect, tray: DOMRect, viewportHeight: nu
   return targets;
 }
 
-function easeOutCubic(t: number) {
-  return 1 - (1 - t) ** 3;
-}
-
 export function rollDice(options: RollDiceOptions): () => void {
   const { canvas, sheet, tray } = options;
   const root = canvas.parentElement!;
@@ -193,118 +188,219 @@ export function rollDice(options: RollDiceOptions): () => void {
   const renderer = new WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
+  // Orthographic in pixel units: a point on the table at (x, y, z) lands on screen at
+  // (x, z·cos − y·sin), so page coordinates map straight onto the table.
   const scene = new Scene();
-  const camera = new OrthographicCamera(0, 1, 0, -1, -500, 500);
+  const camera = new OrthographicCamera(0, 1, 0, -1, 1, CAMERA_DISTANCE * 2);
+  camera.position.set(0, CAMERA_DISTANCE * COS, CAMERA_DISTANCE * SIN);
+  camera.lookAt(0, 0, 0);
   scene.add(new AmbientLight(0xffffff, 1.6));
   const sun = new DirectionalLight(0xffffff, 2.2);
-  sun.position.set(-0.6, 0.9, 1.4);
+  sun.position.set(-0.8, 1.6, 1);
   scene.add(sun);
 
-  const geometries = diceGeometries();
+  const shapes: Polyhedron[] = dicePolyhedra();
+  const geometries: BufferGeometry[] = shapes.map(geometryFromPolyhedron);
+  const edges = geometries.map((geometry) => new EdgesGeometry(geometry, 10));
   const ramp = toonRamp();
   const shadowMap = shadowTexture();
   const edgeMaterial = new LineBasicMaterial({ color: INK, transparent: true, opacity: 0.85 });
-  const shadowGeometry = new PlaneGeometry(1, 1);
-  const shadowMaterial = new MeshBasicMaterial({ map: shadowMap, transparent: true, depthWrite: false });
-  const materials: MeshToonMaterial[] = [];
-  const edgeGeometries: EdgesGeometry[] = [];
+  const shadowGeometry = new PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let dice: Die[] = [];
+  const dice: Die[] = [];
   let width = 0;
   let height = 0;
+  let frame = 0;
 
   const resize = () => {
     width = root.clientWidth;
-    height = window.innerHeight;
+    height = canvas.clientHeight || window.innerHeight;
     renderer.setSize(width, height, false);
     camera.right = width;
     camera.bottom = -height;
     camera.updateProjectionMatrix();
   };
 
-  const place = (die: Die, t: number) => {
-    const eased = easeOutCubic(t);
-    const x = die.start.x + (die.target.x - die.start.x) * eased;
-    const y = die.start.y + (die.target.y - die.start.y) * eased;
-    // Bounces that shrink as the die settles; drives scale and shadow offset.
-    const hop = Math.abs(Math.cos(Math.PI * 2.5 * t)) * (1 - t) ** 2;
-    die.group.position.set(x, -y, 0);
-    die.body.scale.setScalar(die.target.size * 0.5 * (1 + hop * 0.35));
-    const spin = new Quaternion().setFromAxisAngle(die.spinAxis, die.spinAngle * (1 - eased));
-    die.body.quaternion.copy(die.finalRotation).multiply(spin);
-    const lift = hop * die.target.size * 0.6;
-    die.shadow.position.set(die.target.size * 0.12 + lift * 0.5, -die.target.size * 0.18 - lift * 0.6, -200);
-    die.shadow.scale.setScalar(die.target.size * (1.15 - hop * 0.3));
-    (die.shadow.material as MeshBasicMaterial).opacity = 0.9 - hop * 0.5;
+  /** Where a die's centre sits on the table to appear over `target` at `lift` px high. */
+  const home = (target: Target, lift: number) =>
+    new Vector3(target.x, lift, (target.y + lift * SIN) / COS);
+
+  const framePosition = new Vector3();
+  const frameQuaternion = new Quaternion();
+  const nextPosition = new Vector3();
+  const nextQuaternion = new Quaternion();
+
+  /** Point the die's playback at `roll`, ending exactly on its target. */
+  const play = (die: Die, roll: Roll, startAt: number, fromCurrent: boolean) => {
+    readFrame(roll, roll.count - 1, framePosition, frameQuaternion);
+    const end = framePosition.clone().multiplyScalar(die.scale);
+    const goal = home(die.target, end.y);
+    die.roll = roll;
+    die.startAt = startAt;
+    die.rolling = true;
+    if (fromCurrent) {
+      readFrame(roll, 0, framePosition, frameQuaternion);
+      die.offset.copy(die.group.position).sub(framePosition.multiplyScalar(die.scale)).setY(0);
+      die.correction.copy(goal).sub(end).sub(die.offset).setY(0);
+    } else {
+      die.offset.copy(goal).sub(end).setY(0);
+      die.correction.set(0, 0, 0);
+    }
   };
 
-  const build = () => {
-    const rootRect = root.getBoundingClientRect();
-    const targets = layout(rootRect, sheet.getBoundingClientRect(), tray.getBoundingClientRect(), height);
-    dice = targets.map((target, i) => {
-      const geometry = geometries[i % geometries.length];
-      const material = new MeshToonMaterial({
-        color: COLORS[i % COLORS.length],
-        gradientMap: ramp,
-      });
-      materials.push(material);
-      const edges = new EdgesGeometry(geometry, 10);
-      edgeGeometries.push(edges);
+  /** Pose the die for time `now`. Returns true once it has come to rest. */
+  const pose = (die: Die, now: number) => {
+    const { roll, scale } = die;
+    const progress = Math.max(now - die.startAt, 0) / FRAME_MS;
+    const last = roll.count - 1;
+    const index = Math.min(Math.floor(progress), last);
+    const blend = Math.min(progress - index, 1);
+    readFrame(roll, index, framePosition, frameQuaternion);
+    readFrame(roll, index + 1, nextPosition, nextQuaternion);
+    framePosition.lerp(nextPosition, blend);
+    frameQuaternion.slerp(nextQuaternion, blend);
 
-      const body = new Group();
-      body.add(new Mesh(geometry, material), new LineSegments(edges, edgeMaterial));
-      const shadow = new Mesh(shadowGeometry, shadowMaterial.clone());
-      const group = new Group();
-      group.add(shadow, body);
-      scene.add(group);
+    const drift = last > 0 ? smoothstep(Math.min(progress / last, 1)) : 1;
+    die.group.position
+      .copy(framePosition)
+      .multiplyScalar(scale)
+      .add(die.offset)
+      .addScaledVector(die.correction, drift);
+    die.group.quaternion.copy(frameQuaternion);
+    die.group.scale.setScalar(scale);
 
-      const faceUp = new Quaternion().setFromUnitVectors(firstFaceNormal(geometry), new Vector3(0, 0, 1));
-      const twist = new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), Math.random() * Math.PI * 2);
-      // Rest slightly tipped so the die reads as a solid, not a flat outline.
-      const tiltAxis = new Vector3(Math.random() - 0.5, Math.random() - 0.5, 0).normalize();
-      const tilt = new Quaternion().setFromAxisAngle(tiltAxis, 0.4 + Math.random() * 0.25);
-      const fromLeft = target.x < width / 2;
-      return {
-        group,
-        body,
-        shadow,
-        target,
-        start: {
-          x: fromLeft ? -120 - Math.random() * 200 : width + 120 + Math.random() * 200,
-          y: target.y - 260 - Math.random() * 200,
-        },
-        finalRotation: tilt.multiply(twist).multiply(faceUp),
-        spinAxis: new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(),
-        spinAngle: Math.PI * (4 + Math.random() * 2),
-        delay: i * 110 + Math.random() * 140,
-        duration: 1300 + Math.random() * 500,
-      };
-    });
+    // Shadow on the table, drifting away from the light as the die rises.
+    readFrame(roll, last, nextPosition, nextQuaternion);
+    const rise = Math.max(framePosition.y - nextPosition.y, 0);
+    const { x, z } = die.group.position;
+    die.shadow.position.set(x + scale * (0.15 + rise * 0.5), 0.5, z - scale * (0.1 + rise * 0.3));
+    die.shadow.scale.setScalar(scale * 2.3 * (1 + rise * 0.08));
+    die.shadowMaterial.opacity = 0.85 * Math.max(1 - rise / 8, 0.2);
+
+    return progress >= last;
   };
 
-  resize();
-  build();
-
-  let frame = 0;
-  const startedAt = performance.now();
   const tick = (now: number) => {
     let running = false;
     for (const die of dice) {
-      const t = Math.min(Math.max((now - startedAt - die.delay) / die.duration, 0), 1);
-      place(die, t);
-      if (t < 1) running = true;
+      if (!die.rolling) continue;
+      if (pose(die, now)) die.rolling = false;
+      else running = true;
     }
     renderer.render(scene, camera);
     frame = running ? requestAnimationFrame(tick) : 0;
   };
 
-  if (reduceMotion) {
-    for (const die of dice) place(die, 1);
-    renderer.render(scene, camera);
-  } else {
-    frame = requestAnimationFrame(tick);
-  }
+  const animate = () => {
+    if (!frame) frame = requestAnimationFrame(tick);
+  };
+
+  const settle = (die: Die) => {
+    play(die, die.roll, -Infinity, false);
+    pose(die, 0);
+    die.rolling = false;
+  };
+
+  const addDie = (target: Target, index: number, startAt: number) => {
+    const kind = index % shapes.length;
+    const material = new MeshToonMaterial({ color: COLORS[index % COLORS.length], gradientMap: ramp });
+    const mesh = new Mesh(geometries[kind], material);
+    const group = new Group();
+    group.add(mesh, new LineSegments(edges[kind], edgeMaterial));
+    const shadowMaterial = new MeshBasicMaterial({ map: shadowMap, transparent: true, depthWrite: false });
+    const shadow = new Mesh(shadowGeometry, shadowMaterial);
+    scene.add(shadow, group);
+
+    const die: Die = {
+      kind,
+      group,
+      mesh,
+      material,
+      shadow,
+      shadowMaterial,
+      target,
+      scale: target.size / 2,
+      roll: rollUntilFlat(shapes[kind], () => throwIn(target.x < width / 2)),
+      offset: new Vector3(),
+      correction: new Vector3(),
+      startAt,
+      rolling: true,
+    };
+    dice.push(die);
+    if (startAt === -Infinity) settle(die);
+    else play(die, die.roll, startAt, false);
+  };
+
+  const removeDie = (die: Die) => {
+    scene.remove(die.group, die.shadow);
+    die.material.dispose();
+    die.shadowMaterial.dispose();
+  };
+
+  const targets = () =>
+    layout(root.getBoundingClientRect(), sheet.getBoundingClientRect(), tray.getBoundingClientRect(), height);
+
+  resize();
+  const now = performance.now();
+  targets().forEach((target, i) => {
+    addDie(target, i, reduceMotion ? -Infinity : now + i * 160 + random(0, 140));
+  });
+  if (reduceMotion) renderer.render(scene, camera);
+  else animate();
+
+  const reroll = (die: Die) => {
+    readFrame(die.roll, die.roll.count - 1, framePosition, frameQuaternion);
+    const resting = frameQuaternion.clone();
+    const lift = framePosition.y;
+    const roll = rollUntilFlat(shapes[die.kind], () => throwUp(lift, resting));
+    play(die, roll, performance.now(), true);
+    if (reduceMotion) {
+      pose(die, Infinity);
+      die.rolling = false;
+      renderer.render(scene, camera);
+    } else {
+      animate();
+    }
+  };
+
+  // Dice sit above the page with pointer-events off, so hit-test them by hand.
+  const raycaster = new Raycaster();
+  const pointer = new Vector2();
+  const dieAt = (event: MouseEvent): Die | undefined => {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    if (x < 0 || y < 0 || x > rect.width || y > rect.height) return undefined;
+    pointer.set((x / rect.width) * 2 - 1, -(y / rect.height) * 2 + 1);
+    raycaster.setFromCamera(pointer, camera);
+    const resting = dice.filter((die) => !die.rolling);
+    const [hit] = raycaster.intersectObjects(
+      resting.map((die) => die.mesh),
+      false,
+    );
+    return hit && resting.find((die) => die.mesh === hit.object);
+  };
+
+  let hovering = false;
+  const onPointerMove = (event: PointerEvent) => {
+    if (event.pointerType === "touch") return;
+    const over = dieAt(event) !== undefined;
+    if (over === hovering) return;
+    hovering = over;
+    document.body.style.cursor = over ? "pointer" : "";
+  };
+
+  const onClick = (event: MouseEvent) => {
+    const die = dieAt(event);
+    if (!die) return;
+    event.preventDefault();
+    event.stopPropagation();
+    reroll(die);
+  };
+
+  window.addEventListener("pointermove", onPointerMove, { passive: true });
+  window.addEventListener("click", onClick, true);
 
   // After a resize, settle the dice at their new spots without rolling again.
   let resizeTimer = 0;
@@ -313,10 +409,19 @@ export function rollDice(options: RollDiceOptions): () => void {
     resizeTimer = window.setTimeout(() => {
       cancelAnimationFrame(frame);
       frame = 0;
-      for (const die of dice) scene.remove(die.group);
       resize();
-      build();
-      for (const die of dice) place(die, 1);
+      const next = targets();
+      for (const die of dice.splice(next.length)) removeDie(die);
+      next.forEach((target, i) => {
+        const die = dice[i];
+        if (!die) {
+          addDie(target, i, -Infinity);
+          return;
+        }
+        die.target = target;
+        die.scale = target.size / 2;
+        settle(die);
+      });
       renderer.render(scene, camera);
     }, 150);
   };
@@ -326,8 +431,12 @@ export function rollDice(options: RollDiceOptions): () => void {
     cancelAnimationFrame(frame);
     window.clearTimeout(resizeTimer);
     window.removeEventListener("resize", onResize);
-    for (const geometry of [...geometries, ...edgeGeometries, shadowGeometry]) geometry.dispose();
-    for (const material of [...materials, edgeMaterial, shadowMaterial]) material.dispose();
+    window.removeEventListener("pointermove", onPointerMove);
+    window.removeEventListener("click", onClick, true);
+    if (hovering) document.body.style.cursor = "";
+    for (const die of dice) removeDie(die);
+    for (const geometry of [...geometries, ...edges, shadowGeometry]) geometry.dispose();
+    edgeMaterial.dispose();
     ramp.dispose();
     shadowMap.dispose();
     renderer.dispose();

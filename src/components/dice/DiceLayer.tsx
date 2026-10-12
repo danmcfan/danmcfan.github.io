@@ -5,7 +5,7 @@ type DiceLayerProps = {
   tray: () => HTMLElement;
 };
 
-/** Canvas of three.js dice that roll onto the page once, on first load. */
+/** Canvas of three.js dice that roll onto the page on first load and reroll when clicked. */
 export function DiceLayer(props: DiceLayerProps) {
   let canvas!: HTMLCanvasElement;
   let dispose: (() => void) | undefined;

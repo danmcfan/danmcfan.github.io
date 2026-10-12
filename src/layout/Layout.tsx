@@ -44,7 +44,7 @@ export function Layout(props: LayoutProps) {
           />
           <div class="grid gap-3 md:col-start-1 md:row-start-1">
             <p class="font-mono text-xs tracking-[0.18em] text-ink-soft uppercase">
-              The Sorcery of Software Engineering
+              Software Engineer
             </p>
             <h1 class="font-display text-5xl leading-none text-dragon md:text-6xl">
               Danny O&apos;Brien
