@@ -36,7 +36,7 @@ function contrast(a: RGB, b: RGB) {
 const card = token("card");
 // Where a major and a minor graph-paper line cross on a quest card (see `bg-graph`).
 const gridLine: RGB = [70, 115, 160];
-const graphCrossing = over(gridLine, 0.08, over(gridLine, 0.16, card));
+const graphCrossing = over(gridLine, 0.045, over(gridLine, 0.09, card));
 
 const surfaces: Record<string, RGB> = {
   parchment: token("parchment"),
