@@ -8,7 +8,7 @@ export const badgeVariants = cva(
   {
     variants: {
       variant: {
-        tag: "border-ink/40 bg-white/40 px-1.5 py-1 text-ink",
+        tag: "border-secondary bg-secondary px-1.5 py-1 text-card",
         seal: "border-2 border-current px-2 py-1 font-semibold tracking-widest uppercase -rotate-2",
       },
     },

@@ -1,7 +1,8 @@
 import { createSignal, For, Index, onCleanup, onMount, Show } from "solid-js";
 
-import { education, formatMonth, type Landmark, positions } from "../../data/positions";
-import { Badge } from "../ui/badge";
+import { education, type Landmark, positions } from "../../data/positions";
+import { Die, type DieSides } from "../ui/die";
+import { EntryMeta } from "./EntryMeta";
 import { compassPath, landmarkPaths, type SceneryKind, sceneryPaths } from "./mapDoodles";
 
 type Stop = { landmark: Landmark; label: string };
@@ -14,56 +15,25 @@ const stops: Stop[] = [
   { landmark: education.landmark, label: "UC Davis" },
 ];
 
-const sceneryCycle: SceneryKind[] = ["pines", "mountains", "hills", "waves", "tree", "mountains", "pines"];
+const sceneryCycle: SceneryKind[] = ["pines", "mountains", "tree", "hills", "waves", "pines"];
 
-function monthsBetween(start: string, end?: string) {
-  const [sy, sm] = start.split("-").map(Number);
-  const now = new Date();
-  const [ey, em] = end ? end.split("-").map(Number) : [now.getFullYear(), now.getMonth() + 1];
-  return (ey - sy) * 12 + (em - sm);
-}
-
-function formatTenure(months: number) {
-  const years = Math.floor(months / 12);
-  const rest = months % 12;
-  const parts = [];
-  if (years) parts.push(`${years} yr${years > 1 ? "s" : ""}`);
-  if (rest) parts.push(`${rest} mo`);
-  return parts.join(" ") || "1 mo";
-}
+const dice: DieSides[] = [20, 6, 8, 4];
 
 type Point = { x: number; y: number };
 
-/** Catmull-Rom spline through the points, as SVG cubic Béziers. */
-function smoothPath(points: Point[]) {
-  let d = `M${points[0].x} ${points[0].y}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[Math.max(i - 1, 0)];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[Math.min(i + 2, points.length - 1)];
-    const c1 = { x: p1.x + (p2.x - p0.x) / 6, y: p1.y + (p2.y - p0.y) / 6 };
-    const c2 = { x: p2.x - (p3.x - p1.x) / 6, y: p2.y - (p3.y - p1.y) / 6 };
-    d += ` C${c1.x.toFixed(1)} ${c1.y.toFixed(1)}, ${c2.x.toFixed(1)} ${c2.y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+/**
+ * Snakes through the points with a vertical tangent at each one, so the trail
+ * leaves and arrives at every bend heading straight down the page.
+ */
+function snakePath(points: Point[]) {
+  let d = `M${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1];
+    const b = points[i];
+    const pull = (b.y - a.y) / 2;
+    d += ` C${a.x.toFixed(1)} ${(a.y + pull).toFixed(1)}, ${b.x.toFixed(1)} ${(b.y - pull).toFixed(1)}, ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
   }
   return d;
-}
-
-/**
- * A prolate trochoid: the trail dips past the centre, swings back up and over
- * itself, then carries on down. `side` picks which way the loop bulges.
- */
-function loopPoints(center: Point, radius: number, side: 1 | -1) {
-  const advance = radius * 0.38;
-  const samples = 14;
-  return Array.from({ length: samples + 1 }, (_, k) => {
-    const t = -Math.PI + (2 * Math.PI * k) / samples;
-    return {
-      x: center.x - side * radius * Math.cos(t),
-      // Stretched vertically so the loop reads round rather than flat.
-      y: center.y + 1.5 * (advance * t - radius * Math.sin(t)),
-    };
-  });
 }
 
 type MapLayout = {
@@ -71,7 +41,7 @@ type MapLayout = {
   height: number;
   stops: Point[];
   path: string;
-  scenery: { kind: SceneryKind; x: number; y: number; scale: number }[];
+  scenery: { kind: SceneryKind; x: number; y: number }[];
 };
 
 /** Work history beside a static, hand-drawn map of where it happened. */
@@ -87,68 +57,48 @@ export function CampaignLog() {
     const height = wrapper.offsetHeight;
     if (!width || !height) return;
     const wide = width >= 120;
+    const scale = wide ? 1 : 0.8;
+    const left = width * 0.34;
+    const right = width * 0.66;
     const points = items.map((item, i) => ({
-      x: width * (i % 2 === 0 ? 0.36 : 0.64),
+      x: i % 2 === 0 ? left : right,
       // Level with the middle of the entry's title.
       y: item.offsetTop + 15,
     }));
 
-    // Loop the trail in the two longest stretches between stops.
-    const loops = wide
-      ? points
-          .slice(1)
-          .map((point, i) => ({ index: i + 1, gap: point.y - points[i].y }))
-          .filter((stretch) => stretch.gap >= 200)
-          .sort((a, b) => b.gap - a.gap)
-          .slice(0, 2)
-          .map((stretch) => stretch.index)
-      : [];
-
-    const route: Point[] = [{ x: width * 0.5, y: 0 }];
-    points.forEach((point, i) => {
-      if (i > 0) {
-        const previous = points[i - 1];
-        const mid = { x: width * 0.5, y: (previous.y + point.y) / 2 };
-        if (loops.includes(i)) {
-          const gap = point.y - previous.y;
-          const side = i % 2 ? 1 : -1;
-          const swing = mid.x - side * width * 0.16;
-          route.push({ x: swing, y: previous.y + gap * 0.2 });
-          route.push(...loopPoints(mid, Math.min(width * 0.18, gap * 0.12), side));
-          route.push({ x: swing, y: point.y - gap * 0.2 });
-        } else {
-          // Roughly one bend per 180px, alternating sides, so long stretches meander.
-          const gap = point.y - previous.y;
-          const bends = Math.max(1, Math.round(gap / 180));
-          for (let k = 1; k <= bends; k++) {
-            const side = (i + k) % 2 ? 1 : -1;
-            route.push({ x: mid.x + side * width * 0.2, y: previous.y + (gap * k) / (bends + 1) });
-          }
-        }
-      }
-      route.push(point);
-    });
-    route.push({ x: width * 0.5, y: height });
-
+    // The trail runs from just below each landmark to just above the next, so
+    // it never crosses a doodle or its label.
+    const route: Point[][] = [];
     const scenery: MapLayout["scenery"] = [];
-    points.slice(0, -1).forEach((point, i) => {
-      const next = points[i + 1];
-      const gap = next.y - point.y;
-      if (gap < 110) return;
-      const y = point.y + gap / 2;
-      const kind = sceneryCycle[i % sceneryCycle.length];
-      if (wide) {
-        scenery.push({ kind, x: width * (i % 2 ? 0.16 : 0.84), y: y - gap * 0.12, scale: 1.2 });
-        if (gap > 220) {
-          const other = sceneryCycle[(i + 3) % sceneryCycle.length];
-          scenery.push({ kind: other, x: width * (i % 2 ? 0.8 : 0.2), y: y + gap * 0.22, scale: 1 });
-        }
-      } else {
-        scenery.push({ kind: "pines", x: width * (i % 2 ? 0.2 : 0.8), y, scale: 0.6 });
+    points.slice(0, -1).forEach((from, i) => {
+      const to = points[i + 1];
+      const exit = { x: from.x, y: from.y + 22 * scale };
+      const entry = { x: to.x, y: to.y - 26 * scale };
+      const gap = entry.y - exit.y;
+      // Long stretches wander out towards the edges and back before arriving.
+      const swings = wide && gap > 240 ? 2 : 0;
+      const leg: Point[] = [exit];
+      for (let k = 1; k <= swings; k++) {
+        const outward = k % 2 === 1 ? to.x : from.x;
+        leg.push({ x: outward < width / 2 ? width * 0.2 : width * 0.8, y: exit.y + (gap * k) / (swings + 1) });
       }
+      leg.push(entry);
+      route.push(leg);
+
+      if (!wide || gap < 140) return;
+      // Scenery sits where the trail is furthest away: opposite each bend, or
+      // opposite the trail as it sets off on a single sweep.
+      const bends = swings ? leg.slice(1, -1) : [{ x: exit.x, y: exit.y + gap * 0.3 }];
+      bends.forEach((bend, k) => {
+        scenery.push({
+          kind: sceneryCycle[(i * 2 + k) % sceneryCycle.length],
+          x: bend.x < width / 2 ? width * 0.8 : width * 0.2,
+          y: bend.y,
+        });
+      });
     });
 
-    setMap({ width, height, stops: points, path: smoothPath(route), scenery });
+    setMap({ width, height, stops: points, path: route.map(snakePath).join(" "), scenery });
   };
 
   // The map is redrawn only when the entries beside it reflow.
@@ -174,30 +124,22 @@ export function CampaignLog() {
                 height={layout().height}
                 viewBox={`0 0 ${layout().width} ${layout().height}`}
               >
-                <g filter="url(#sketch)" class="fill-none stroke-ink-soft/60" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <g filter="url(#sketch)" class="fill-none stroke-ink-soft" stroke-linecap="round" stroke-linejoin="round">
+                  <path d={layout().path} stroke-width="1.8" stroke-dasharray="5 6" />
+                  <g class="stroke-ink-soft/70" stroke-width="1.5">
+                    <For each={layout().scenery}>
+                      {(item) => <path d={sceneryPaths[item.kind]} transform={`translate(${item.x} ${item.y})`} />}
+                    </For>
+                  </g>
                   <Show when={layout().width >= 120}>
-                    <g transform={`translate(${layout().width * 0.12} 2)`}>
+                    <g transform={`translate(${layout().width * 0.8} ${layout().height - 18})`} stroke-width="1.5">
                       <path d={compassPath} />
                       <text y="-19" text-anchor="middle" class="fill-ink-soft stroke-none font-display text-[12px]">
                         N
                       </text>
                     </g>
                   </Show>
-                  <For each={layout().scenery}>
-                    {(item) => (
-                      <path d={sceneryPaths[item.kind]} transform={`translate(${item.x} ${item.y}) scale(${item.scale})`} />
-                    )}
-                  </For>
                 </g>
-
-                <path
-                  d={layout().path}
-                  fill="none"
-                  class="stroke-ink/45"
-                  stroke-width="2"
-                  stroke-dasharray="1 7"
-                  stroke-linecap="round"
-                />
 
                 <Index each={layout().stops}>
                   {(point, i) => {
@@ -246,27 +188,17 @@ export function CampaignLog() {
                   {position.title}
                 </h3>
                 <p class="text-lg leading-snug">{position.company}</p>
-                <p class="text-sm text-ink-soft">
-                  {formatMonth(position.start)} – {position.end ? formatMonth(position.end) : "Present"} ·{" "}
-                  {formatTenure(monthsBetween(position.start, position.end))} · {position.location}
-                </p>
+                <EntryMeta start={position.start} end={position.end} location={position.location} tenure />
                 <Show when={position.highlights.length}>
-                  <ul class="mt-2 grid max-w-[64ch] gap-1.5">
+                  <ul class="mt-3 grid max-w-[64ch] gap-2">
                     <For each={position.highlights}>
-                      {(highlight) => (
-                        <li class="relative pl-5 leading-snug before:absolute before:top-[0.55em] before:left-1 before:size-1.5 before:rotate-45 before:bg-dragon/80">
+                      {(highlight, k) => (
+                        <li class="relative pl-7 leading-snug">
+                          <Die
+                            sides={dice[k() % dice.length]}
+                            class={`absolute top-[0.08em] left-0.5 size-[1.1em] text-dragon ${k() % 2 ? "rotate-6" : "-rotate-6"}`}
+                          />
                           {highlight}
-                        </li>
-                      )}
-                    </For>
-                  </ul>
-                </Show>
-                <Show when={position.tools.length}>
-                  <ul class="mt-3 flex flex-wrap gap-1.5" aria-label="Tools">
-                    <For each={position.tools}>
-                      {(tool) => (
-                        <li>
-                          <Badge>{tool}</Badge>
                         </li>
                       )}
                     </For>
@@ -281,9 +213,7 @@ export function CampaignLog() {
             </h3>
             <p class="text-lg leading-snug">{education.degree}</p>
             <p class="leading-snug">{education.specialization}</p>
-            <p class="text-sm text-ink-soft">
-              {education.years} · {education.location}
-            </p>
+            <EntryMeta start={education.start} end={education.end} location={education.location} />
           </li>
         </ol>
       </div>

@@ -19,7 +19,6 @@ export type Position = {
   /** Doodle that marks this stop on the campaign map. */
   landmark: Landmark;
   highlights: string[];
-  tools: string[];
 };
 
 /** Work history, newest first. */
@@ -37,7 +36,6 @@ export const positions: Position[] = [
       "Delivered full-stack mapping apps in React and FastAPI for real-time geospatial analysis, improving user productivity by 500%.",
       "Optimized PyTorch computer vision models, raising accuracy 25% and halving inference time.",
     ],
-    tools: ["Python", "React", "FastAPI", "PyTorch", "Docker", "Terraform", "AWS ECS Fargate"],
   },
   {
     id: "aicadium",
@@ -53,7 +51,6 @@ export const positions: Position[] = [
       "Architected a model training platform with FastAPI and PyTorch on Kubernetes, cutting client onboarding by 93%, from two weeks to one day.",
       "Designed secure AWS infrastructure with load balancers, Secrets Manager credential rotation and multi-tenant isolation, improving scalability and reliability by 60%.",
     ],
-    tools: ["Go", "Python", "React", "FastAPI", "PyTorch", "DynamoDB", "Redis", "Kubernetes", "AWS"],
   },
   {
     id: "seekops",
@@ -69,7 +66,6 @@ export const positions: Position[] = [
       "Integrated ClickHouse for OLAP analytics on drone IoT sensor streams, querying billions of points with sub-second latency.",
       "Deployed Python and Go microservices on Docker and Kubernetes in AWS with least-privilege IAM, speeding deploys by 50%.",
     ],
-    tools: ["Go", "Python", "React", "gRPC", "WebSockets", "ClickHouse", "Kubernetes", "AWS"],
   },
   {
     id: "benson-hill",
@@ -80,7 +76,6 @@ export const positions: Position[] = [
     location: "St. Louis, MO",
     landmark: "windmill",
     highlights: [],
-    tools: [],
   },
   {
     id: "lightbox",
@@ -91,7 +86,6 @@ export const positions: Position[] = [
     location: "Irvine, CA",
     landmark: "village",
     highlights: [],
-    tools: [],
   },
   {
     id: "far-western",
@@ -102,7 +96,6 @@ export const positions: Position[] = [
     location: "Davis, CA",
     landmark: "ruins",
     highlights: [],
-    tools: [],
   },
 ];
 
@@ -111,7 +104,8 @@ export const education = {
   school: "University of California, Davis",
   degree: "B.S. Environmental Science",
   specialization: "Specialization in Geospatial Information Systems",
-  years: "Sep 2016 – Jun 2019",
+  start: "2016-09",
+  end: "2019-06",
   location: "Davis, CA",
   landmark: "camp" as Landmark,
 };

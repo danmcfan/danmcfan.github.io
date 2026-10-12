@@ -59,6 +59,10 @@ describe("text colours meet AA (4.5:1) on every surface", () => {
     expect(contrast(token("parchment"), token("ink"))).toBeGreaterThanOrEqual(4.5);
     expect(contrast(token("parchment"), token("dragon"))).toBeGreaterThanOrEqual(4.5);
   });
+
+  test("card on the pencil badge", () => {
+    expect(contrast(token("card"), token("pencil"))).toBeGreaterThanOrEqual(4.5);
+  });
 });
 
 function sourceFiles(dir: string): string[] {
