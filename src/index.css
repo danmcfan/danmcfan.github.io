@@ -125,6 +125,7 @@
     opacity 0s;
 }
 
+/* biome-ignore-start lint/complexity/noImportantStyles: reduced motion must beat every component's own timing. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -133,3 +134,4 @@
     animation-duration: 0.01ms !important;
   }
 }
+/* biome-ignore-end lint/complexity/noImportantStyles: reduced motion must beat every component's own timing. */

@@ -31,11 +31,6 @@ export function DiceLayer(props: DiceLayerProps) {
     dispose?.();
   });
 
-  return (
-    <canvas
-      ref={canvas}
-      class="pointer-events-none fixed top-0 left-0 z-10 h-lvh w-full"
-      aria-hidden="true"
-    />
-  );
+  // biome-ignore lint/a11y/noAriaHiddenOnFocusable: the canvas has no tabindex and ignores the pointer, so it never takes focus.
+  return <canvas ref={canvas} class="pointer-events-none fixed top-0 left-0 z-10 h-lvh w-full" aria-hidden="true" />;
 }

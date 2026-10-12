@@ -1,6 +1,6 @@
-import { type JSX } from "solid-js";
+import type { JSX } from "solid-js";
 
-import { type Project } from "../../data/projects";
+import type { Project } from "../../data/projects";
 import { Doodle } from "../ui/doodle";
 
 const doodles: Record<Project["icon"], () => JSX.Element> = {

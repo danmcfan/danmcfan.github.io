@@ -193,7 +193,12 @@ export class DiceTable {
       new ContactMaterial(this.material, this.material, { friction: DICE_FRICTION, restitution: DICE_RESTITUTION }),
     );
 
-    const floor = new Body({ mass: 0, shape: new Plane(), collisionFilterGroup: FLOOR_GROUP, collisionFilterMask: DIE_GROUP });
+    const floor = new Body({
+      mass: 0,
+      shape: new Plane(),
+      collisionFilterGroup: FLOOR_GROUP,
+      collisionFilterMask: DIE_GROUP,
+    });
     floor.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
     this.world.addBody(floor);
   }
@@ -285,7 +290,11 @@ export class DiceTable {
     const poly = this.shapes[die.kind];
     const q = flatten(
       poly,
-      orientation ?? new Quaternion().setFromAxisAngle(new Vector3(random(-1, 1), random(-1, 1), random(-1, 1)).normalize(), random(0, 7)),
+      orientation ??
+        new Quaternion().setFromAxisAngle(
+          new Vector3(random(-1, 1), random(-1, 1), random(-1, 1)).normalize(),
+          random(0, 7),
+        ),
     );
     const { body } = die;
     body.position.set(x, restHeight(poly, q), z);
@@ -388,7 +397,7 @@ export class DiceTable {
    */
   private struck(die: TableDie, other: Body) {
     const striker = this.byBody.get(other);
-    if (!striker || striker.state !== "moving" || (die.state !== "rest" && die.state !== "easing")) return;
+    if (striker?.state !== "moving" || (die.state !== "rest" && die.state !== "easing")) return;
     const { velocity } = other;
     const speed = Math.hypot(velocity.x, velocity.y, velocity.z);
     if (speed < KNOCK_SPEED) return;

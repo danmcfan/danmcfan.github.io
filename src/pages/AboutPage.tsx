@@ -6,59 +6,14 @@ import { SocialLinks } from "../components/about/SocialLinks";
 import { Badge } from "../components/ui/badge";
 import { cardVariants } from "../components/ui/card";
 import { careerStart, positions } from "../data/positions";
+import { resume, shortLocation, skillBadges } from "../data/resume";
 import { socials } from "../data/socials";
 import { cn } from "../lib/cn";
 import { usePageTitle } from "../lib/usePageTitle";
 
 const YEAR = 365.25 * 24 * 60 * 60 * 1000;
 
-const skills = [
-  {
-    group: "Cloud Infrastructure",
-    items: [
-      "AWS ECS Fargate",
-      "AWS ALB",
-      "AWS Secrets Manager",
-      "AWS S3",
-      "AWS Lambda",
-      "AWS EC2",
-      "AWS IAM",
-      "Terraform",
-      "Docker",
-      "Kubernetes",
-      "Google Cloud Platform",
-      "Azure",
-    ],
-  },
-  {
-    group: "Backend Systems",
-    items: [
-      "Go",
-      "Python (FastAPI, Django)",
-      "gRPC",
-      "WebSockets",
-      "RESTful APIs",
-      "Microservices",
-      "Distributed Systems",
-    ],
-  },
-  {
-    group: "Databases",
-    items: ["DynamoDB", "ClickHouse", "Redis", "PostgreSQL", "MySQL", "MongoDB", "Kafka", "Neo4j", "SQLite"],
-  },
-  {
-    group: "Frontend Development",
-    items: ["React", "NextJS", "TypeScript", "JavaScript", "Tailwind CSS", "HTML/CSS"],
-  },
-  {
-    group: "Machine Learning",
-    items: ["PyTorch", "TensorFlow", "Scikit-Learn", "Pandas", "NumPy", "Model Deployment"],
-  },
-  {
-    group: "DevOps & Tools",
-    items: ["CI/CD (GitHub Actions)", "Git", "Agile/Scrum", "Test-Driven Development (TDD)", "System Design"],
-  },
-];
+const skills = resume.skills.map((row) => ({ group: row.group, items: row.items.flatMap(skillBadges) }));
 
 export function AboutPage() {
   usePageTitle("Character Sheet");
@@ -82,14 +37,7 @@ export function AboutPage() {
 
         <div class="grid content-start gap-5">
           <h2 class="font-display text-3xl leading-tight text-dragon md:text-4xl">{current.title}</h2>
-          <p class="max-w-[62ch] text-lg leading-relaxed">
-            Senior Software Engineer with 5+ years of experience architecting secure, high-scale cloud
-            infrastructure and production AI systems. Expert in modernizing enterprise tech stacks using AWS (ECS
-            Fargate, Secrets Manager), Terraform, and Docker, with a proven track record of optimizing pipelines to
-            handle 10TB of daily data. Specialized in delivering business-critical full-stack solutions using Python,
-            Go, and React while driving strict security compliance and operational efficiency. Outside of work, I am
-            an avid outdoorsman who enjoys backpacking, rock climbing, and surfing.
-          </p>
+          <p class="max-w-[62ch] text-lg leading-relaxed">{resume.summary}</p>
         </div>
       </header>
 
@@ -99,10 +47,18 @@ export function AboutPage() {
             About
           </h2>
           <ul class="grid auto-rows-fr gap-5">
-            <AboutCard icon="briefcase" label="Currently">{current.company}</AboutCard>
-            <AboutCard icon="pin" label="Based in">San Diego, CA</AboutCard>
-            <AboutCard icon="hourglass" label="Experience">{years}+ years</AboutCard>
-            <AboutCard icon="cap" label="Education">B.S., UC Davis</AboutCard>
+            <AboutCard icon="briefcase" label="Currently">
+              {current.company}
+            </AboutCard>
+            <AboutCard icon="pin" label="Based in">
+              {shortLocation(resume.contact.location)}
+            </AboutCard>
+            <AboutCard icon="hourglass" label="Experience">
+              {years}+ years
+            </AboutCard>
+            <AboutCard icon="cap" label="Education">
+              B.S., UC Davis
+            </AboutCard>
           </ul>
         </section>
 

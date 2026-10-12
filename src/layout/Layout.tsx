@@ -1,5 +1,5 @@
 import { useLocation } from "@solidjs/router";
-import { createEffect, on, type JSX } from "solid-js";
+import { createEffect, type JSX, on } from "solid-js";
 
 import { DiceLayer } from "../components/dice/DiceLayer";
 import { NavBar } from "../components/navigation/NavBar";
@@ -32,10 +32,7 @@ export function Layout(props: LayoutProps) {
   return (
     <div class="relative flex min-h-dvh flex-col overflow-x-clip bg-parchment-page text-ink">
       <SketchFilter />
-      <div
-        ref={sheet}
-        class="relative mx-auto flex w-full max-w-5xl flex-1 flex-col px-5 py-8 md:px-14 md:py-12"
-      >
+      <div ref={sheet} class="relative mx-auto flex w-full max-w-5xl flex-1 flex-col px-5 py-8 md:px-14 md:py-12">
         <header class="grid gap-x-6 md:grid-cols-[1fr_minmax(0,20rem)]">
           <div
             ref={diceTray}
@@ -43,12 +40,8 @@ export function Layout(props: LayoutProps) {
             aria-hidden="true"
           />
           <div class="grid gap-3 md:col-start-1 md:row-start-1">
-            <p class="font-mono text-xs tracking-[0.18em] text-ink-soft uppercase">
-              Senior Software Engineer
-            </p>
-            <h1 class="font-display text-5xl leading-none text-dragon md:text-6xl">
-              Danny O&apos;Brien
-            </h1>
+            <p class="font-mono text-xs tracking-[0.18em] text-ink-soft uppercase">Senior Software Engineer</p>
+            <h1 class="font-display text-5xl leading-none text-dragon md:text-6xl">Danny O&apos;Brien</h1>
             <div class="pt-2">
               <NavBar />
             </div>

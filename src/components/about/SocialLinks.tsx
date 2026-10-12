@@ -2,7 +2,7 @@ import { FileDown, Github, Linkedin } from "lucide-solid";
 import { For } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { type Social } from "../../data/socials";
+import type { Social } from "../../data/socials";
 import { cn } from "../../lib/cn";
 import { buttonVariants } from "../ui/button";
 
@@ -29,9 +29,7 @@ export function SocialLinks(props: SocialLinksProps) {
                 "transition-[color,border-color,translate] motion-safe:hover:-translate-y-0.5",
               )}
               href={social.href}
-              {...(social.download
-                ? { download: social.download }
-                : { target: "_blank", rel: "noopener noreferrer" })}
+              {...(social.download ? { download: social.download } : { target: "_blank", rel: "noopener noreferrer" })}
             >
               <Dynamic component={iconByKind[social.kind]} class="size-5" aria-hidden="true" />
               <span class="sr-only">

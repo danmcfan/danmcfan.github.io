@@ -1,6 +1,6 @@
 import {
   AmbientLight,
-  BufferGeometry,
+  type BufferGeometry,
   CanvasTexture,
   DirectionalLight,
   EdgesGeometry,
@@ -22,7 +22,7 @@ import {
 } from "three";
 
 import { type DiceLayout, layoutDice, type PageGeometry, type Rect, type Target } from "./layout";
-import { type Bounds, DiceTable, geometryFromPolyhedron, GRAVITY, type Polyhedron, type TableDie } from "./physics";
+import { type Bounds, DiceTable, GRAVITY, geometryFromPolyhedron, type Polyhedron, type TableDie } from "./physics";
 import { dicePolyhedra } from "./shapes";
 
 type RollDiceOptions = {
@@ -315,7 +315,9 @@ export function rollDice(options: RollDiceOptions): () => void {
   const targetsFor = (next: DiceLayout) => {
     plan = next;
     scale = next.size / 2;
-    next.targets.forEach((target, i) => addDie(target, i));
+    next.targets.forEach((target, i) => {
+      addDie(target, i);
+    });
     table.setRegions(next.regions.map(bounds));
   };
 
@@ -333,7 +335,9 @@ export function rollDice(options: RollDiceOptions): () => void {
       const thrown = dice.map((die) => !die.pending);
       for (const die of dice.splice(0)) removeDie(die);
       targetsFor(next);
-      dice.forEach((die, i) => thrown[i] && settleAt(die));
+      dice.forEach((die, i) => {
+        if (thrown[i]) settleAt(die);
+      });
     } else {
       plan = next;
       for (const die of dice.splice(next.targets.length)) removeDie(die);
@@ -384,7 +388,10 @@ export function rollDice(options: RollDiceOptions): () => void {
     let distance = random(1.5, 3.5);
     const neighbour = dice
       .filter((other) => other !== die && !other.pending && other.physics.region === die.physics.region)
-      .map((other) => ({ other, gap: Math.hypot(other.physics.body.position.x - position.x, other.physics.body.position.z - position.z) }))
+      .map((other) => ({
+        other,
+        gap: Math.hypot(other.physics.body.position.x - position.x, other.physics.body.position.z - position.z),
+      }))
       .sort((a, b) => a.gap - b.gap)[0];
     if (neighbour && neighbour.gap < 7 && Math.random() < 0.6) {
       const { x, z } = neighbour.other.physics.body.position;

@@ -1,6 +1,6 @@
 import { type JSX, Show } from "solid-js";
 
-import { formatMonth } from "../../data/positions";
+import { formatMonth } from "../../data/resume";
 
 function Glyph(props: { children: JSX.Element }) {
   return (

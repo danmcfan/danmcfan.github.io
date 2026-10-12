@@ -1,0 +1,8 @@
+{
+  // Tests and scripts: run by Bun, never shipped to the browser.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["bun"]
+  },
+  "include": ["src/**/*.test.ts", "scripts"]
+}

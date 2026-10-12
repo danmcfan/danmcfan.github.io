@@ -66,12 +66,7 @@ export function InkUnderline() {
       preserveAspectRatio="none"
       aria-hidden="true"
     >
-      <path
-        class="ink-stroke"
-        pathLength="1"
-        stroke-width="2"
-        d="M1 5 C 20 2, 40 7, 60 4 S 90 3, 99 5"
-      />
+      <path class="ink-stroke" pathLength="1" stroke-width="2" d="M1 5 C 20 2, 40 7, 60 4 S 90 3, 99 5" />
     </svg>
   );
 }
