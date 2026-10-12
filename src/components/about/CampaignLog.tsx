@@ -49,6 +49,23 @@ function smoothPath(points: Point[]) {
   return d;
 }
 
+/**
+ * A prolate trochoid: the trail dips past the centre, swings back up and over
+ * itself, then carries on down. `side` picks which way the loop bulges.
+ */
+function loopPoints(center: Point, radius: number, side: 1 | -1) {
+  const advance = radius * 0.38;
+  const samples = 14;
+  return Array.from({ length: samples + 1 }, (_, k) => {
+    const t = -Math.PI + (2 * Math.PI * k) / samples;
+    return {
+      x: center.x - side * radius * Math.cos(t),
+      // Stretched vertically so the loop reads round rather than flat.
+      y: center.y + 1.5 * (advance * t - radius * Math.sin(t)),
+    };
+  });
+}
+
 type MapLayout = {
   width: number;
   height: number;
@@ -76,14 +93,38 @@ export function CampaignLog() {
       y: item.offsetTop + 15,
     }));
 
+    // Loop the trail in the two longest stretches between stops.
+    const loops = wide
+      ? points
+          .slice(1)
+          .map((point, i) => ({ index: i + 1, gap: point.y - points[i].y }))
+          .filter((stretch) => stretch.gap >= 200)
+          .sort((a, b) => b.gap - a.gap)
+          .slice(0, 2)
+          .map((stretch) => stretch.index)
+      : [];
+
     const route: Point[] = [{ x: width * 0.5, y: 0 }];
     points.forEach((point, i) => {
       if (i > 0) {
         const previous = points[i - 1];
-        route.push({
-          x: (previous.x + point.x) / 2 + width * (i % 2 ? 0.1 : -0.1),
-          y: (previous.y + point.y) / 2,
-        });
+        const mid = { x: width * 0.5, y: (previous.y + point.y) / 2 };
+        if (loops.includes(i)) {
+          const gap = point.y - previous.y;
+          const side = i % 2 ? 1 : -1;
+          const swing = mid.x - side * width * 0.16;
+          route.push({ x: swing, y: previous.y + gap * 0.2 });
+          route.push(...loopPoints(mid, Math.min(width * 0.18, gap * 0.12), side));
+          route.push({ x: swing, y: point.y - gap * 0.2 });
+        } else {
+          // Roughly one bend per 180px, alternating sides, so long stretches meander.
+          const gap = point.y - previous.y;
+          const bends = Math.max(1, Math.round(gap / 180));
+          for (let k = 1; k <= bends; k++) {
+            const side = (i + k) % 2 ? 1 : -1;
+            route.push({ x: mid.x + side * width * 0.2, y: previous.y + (gap * k) / (bends + 1) });
+          }
+        }
       }
       route.push(point);
     });
