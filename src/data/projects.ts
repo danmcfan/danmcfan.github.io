@@ -15,20 +15,20 @@ export const projects: Project[] = [
     href: "https://arcade.dannyobrien.dev",
   },
   {
-    icon: "sprout",
-    name: "Oh Green World",
-    description:
-      "Predicts how green the land is from soil and climate data, comparing observed and predicted NDVI on a web map.",
-    tags: ["Python", "Earth Engine", "React", "MapLibre"],
-    href: "https://green.dannyobrien.dev",
-  },
-  {
     icon: "cpu",
     name: "Layers of Abstraction",
     description:
       "A logic-gate puzzle game. Start with only NAND and build up NOT, AND, OR and beyond, one truth table at a time.",
     tags: ["TypeScript", "SolidJS", "Tailwind"],
     href: "https://abstract.dannyobrien.dev",
+  },
+  {
+    icon: "sprout",
+    name: "Oh Green World",
+    description:
+      "Predicts how green the land is from soil and climate data, comparing observed and predicted NDVI on a web map.",
+    tags: ["Python", "Earth Engine", "React", "MapLibre"],
+    href: "https://green.dannyobrien.dev",
   },
   {
     icon: "check-check",
